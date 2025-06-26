@@ -5,8 +5,13 @@ const mensajeVacio = document.getElementById('mensajeVacio');
 
 // Función: muestra u oculta el mensaje de lista vacía
 function actualizarMensajeVacio() {
-  mensajeVacio.style.display = listaTareas.children.length === 0 ? 'block' : 'none';
+  if (listaTareas.children.length === 0) {
+    mensajeVacio.classList.add('mostrar');
+  } else {
+    mensajeVacio.classList.remove('mostrar');
+  }
 }
+
 
 // Función: guarda tareas en localStorage
 function guardarTareas() {
@@ -26,24 +31,32 @@ function cargarTareas() {
   const tareasGuardadas = JSON.parse(localStorage.getItem('tareas'));
   if (!tareasGuardadas) return actualizarMensajeVacio();
 
-  tareasGuardadas.forEach(tareaObj => {
+  tareasGuardadas.forEach((tareaObj, index) => {
     const li = document.createElement("li");
-    li.textContent = tareaObj.texto;
+
+    const spanTexto = document.createElement("span");
+    spanTexto.textContent = tareaObj.texto;
+    li.appendChild(spanTexto);
+
     li.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
-    if (tareaObj.completado) li.classList.add('completado');
+    if (tareaObj.completado) li.classList.add("completado");
+
+    // Aplica clase de animación y delay escalonado
+    li.classList.add("fade-in");
+    li.style.animationDelay = `${index * 100}ms`;
 
     const botonEliminar = document.createElement("button");
     botonEliminar.textContent = "🗑";
     botonEliminar.classList.add("btn", "btn-outline-danger", "btn-sm");
 
-    // Evento: eliminar tarea
+    //Evento: eliminar tareas
     botonEliminar.addEventListener('click', (e) => {
       e.stopPropagation();
       li.remove();
       guardarTareas();
     });
 
-    // Evento: marcar tarea completada
+    //Evento: marcar tarea como completada
     li.addEventListener('click', () => {
       li.classList.toggle('completado');
       guardarTareas();
@@ -53,11 +66,14 @@ function cargarTareas() {
     listaTareas.appendChild(li);
   });
 
-  actualizarMensajeVacio(); 
-}
+  actualizarMensajeVacio();
+};
+
+
 
 // Evento: cargar tareas al iniciar
 window.addEventListener('load', cargarTareas);
+
 
 // Evento: agregar tarea
 botonAgregar.addEventListener('click', () => {
@@ -77,7 +93,8 @@ botonAgregar.addEventListener('click', () => {
     //Evento: eliminar tarea
     botonEliminar.addEventListener('click', (e) => {
       e.stopPropagation();
-      li.remove();
+      li.classList.add('eliminando');
+      setTimeout(() => li.remove(), 300); // espera a que termine la animación
       guardarTareas();
     });
 

@@ -1,6 +1,70 @@
+
+/*Animacion al tachar*/
 .completado {
-    text-decoration: line-through;
-    color: gray;
-    opacity:0.5;
+  text-decoration: line-through;
+  color: #6c757d;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+li {
+  transition: all 0.3s ease;
+}
+
+
+/*Animacion al agregar tareas*/
+
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+li {
+  animation: fadeInSlide 0.3s ease-out;
+}
+
+
+/*Animacion al eliminar una tarea*/
+
+.eliminando {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: all 0.3s ease;
+}
+
+
+/*Mensaje sin tareas, aparicion elegante XD */
+#mensajeVacio {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#mensajeVacio.mostrar {
+  opacity: 1;
+}
+
+
+/*Entrada secuencial de las tareas guardadas*/
+
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInSlide 0.4s ease-out forwards;
+  opacity: 0; /* empieza oculta */
 }
 
