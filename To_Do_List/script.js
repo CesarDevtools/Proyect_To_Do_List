@@ -8,20 +8,20 @@ function actualizarMensajeVacio() {
   mensajeVacio.style.display = listaTareas.children.length === 0 ? 'block' : 'none';
 }
 
-// Función: guarda las tareas en localStorage
+// Función: guarda tareas en localStorage
 function guardarTareas() {
   const tareasArray = [];
   listaTareas.querySelectorAll('li').forEach(li => {
     tareasArray.push({
-      texto: li.firstChild.textContent,
+      texto: li.querySelector('span').textContent,
       completado: li.classList.contains('completado')
     });
   });
   localStorage.setItem('tareas', JSON.stringify(tareasArray));
   actualizarMensajeVacio();
-}
+};
 
-// Función: carga tareas desde localStorage
+// Función: cargar tareas guardadas
 function cargarTareas() {
   const tareasGuardadas = JSON.parse(localStorage.getItem('tareas'));
   if (!tareasGuardadas) return actualizarMensajeVacio();
@@ -30,13 +30,11 @@ function cargarTareas() {
     const li = document.createElement("li");
     li.textContent = tareaObj.texto;
     li.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
-    if (tareaObj.completado) {
-      li.classList.add('completado');
-    }
+    if (tareaObj.completado) li.classList.add('completado');
 
     const botonEliminar = document.createElement("button");
-    botonEliminar.textContent = "Eliminar";
-    botonEliminar.classList.add("btn", "btn-danger", "btn-sm", "ms-2");
+    botonEliminar.textContent = "🗑";
+    botonEliminar.classList.add("btn", "btn-outline-danger", "btn-sm");
 
     // Evento: eliminar tarea
     botonEliminar.addEventListener('click', (e) => {
@@ -45,7 +43,7 @@ function cargarTareas() {
       guardarTareas();
     });
 
-    // Evento: marcar tarea como completada
+    // Evento: marcar tarea completada
     li.addEventListener('click', () => {
       li.classList.toggle('completado');
       guardarTareas();
@@ -55,33 +53,35 @@ function cargarTareas() {
     listaTareas.appendChild(li);
   });
 
-  actualizarMensajeVacio();
+  actualizarMensajeVacio(); 
 }
 
-// Evento: cargar tareas al iniciar la página
+// Evento: cargar tareas al iniciar
 window.addEventListener('load', cargarTareas);
 
-// Evento: agregar tarea al hacer clic en el botón
+// Evento: agregar tarea
 botonAgregar.addEventListener('click', () => {
   const tarea = tareaInput.value.trim();
-
   if (tarea !== "") {
     const li = document.createElement("li");
-    li.textContent = tarea;
+    const spanTexto = document.createElement("span");
+    spanTexto.textContent = tarea;
+    li.appendChild(spanTexto);
     li.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
 
+    //Se crea el boton eliminar
     const botonEliminar = document.createElement("button");
-    botonEliminar.textContent = "Eliminar";
-    botonEliminar.classList.add("btn", "btn-danger", "btn-sm", "ms-2");
+    botonEliminar.textContent = "🗑";
+    botonEliminar.classList.add("btn", "btn-outline-danger", "btn-sm");
 
-    // Evento: eliminar tarea
+    //Evento: eliminar tarea
     botonEliminar.addEventListener('click', (e) => {
       e.stopPropagation();
       li.remove();
       guardarTareas();
     });
 
-    // Evento: marcar tarea como completada
+    //Evento: tachar tarea
     li.addEventListener('click', () => {
       li.classList.toggle('completado');
       guardarTareas();
@@ -96,12 +96,13 @@ botonAgregar.addEventListener('click', () => {
   }
 });
 
-// Evento: permitir agregar tarea con Enter
-tareaInput.addEventListener('keydown', (evento) => {
-  if (evento.key === 'Enter') {
+// Evento: Enter también agrega tarea
+tareaInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
     botonAgregar.click();
   }
 });
+
 
 
 
