@@ -45,6 +45,14 @@ function cargarTareas() {
     li.classList.add("fade-in");
     li.style.animationDelay = `${index * 100}ms`;
 
+    // Elimina la clase fade-in al terminar la animación de entrada
+    li.addEventListener('animationend', function handler(e) {
+      if (e.animationName === "fadeInSlide") {
+      li.classList.remove('fade-in');
+      li.removeEventListener('animationend', handler);
+    }
+    });
+
     const botonEliminar = document.createElement("button");
     botonEliminar.textContent = "🗑";
     botonEliminar.classList.add("btn", "btn-outline-danger", "btn-sm");
