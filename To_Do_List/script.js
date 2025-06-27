@@ -10,7 +10,7 @@ function actualizarMensajeVacio() {
   } else {
     mensajeVacio.classList.remove('mostrar');
   }
-}
+};
 
 
 // Función: guarda tareas en localStorage
@@ -57,8 +57,9 @@ function cargarTareas() {
     });
 
     //Evento: marcar tarea como completada
-    li.addEventListener('click', () => {
-      li.classList.toggle('completado');
+    li.addEventListener('click', (e) => {
+      e.stopPropagation
+      li.firstChild.classList.toggle('completado');
       guardarTareas();
     });
 
@@ -91,12 +92,15 @@ botonAgregar.addEventListener('click', () => {
     botonEliminar.classList.add("btn", "btn-outline-danger", "btn-sm");
 
     //Evento: eliminar tarea
-    botonEliminar.addEventListener('click', (e) => {
-      e.stopPropagation();
-      li.classList.add('eliminando');
-      setTimeout(() => li.remove(), 300); // espera a que termine la animación
-      guardarTareas();
-    });
+   botonEliminar.addEventListener('click', (e) => {
+    e.stopPropagation();
+    li.classList.add('eliminando');
+    setTimeout(() => {
+    li.remove();
+    guardarTareas(); // ahora sí se ejecuta cuando el <li> ya no existe
+    }, 300);
+});
+
 
     //Evento: tachar tarea
     li.addEventListener('click', () => {
