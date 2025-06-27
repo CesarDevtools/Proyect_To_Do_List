@@ -52,15 +52,19 @@ function cargarTareas() {
     //Evento: eliminar tareas
     botonEliminar.addEventListener('click', (e) => {
       e.stopPropagation();
+      li.classList.add('eliminando');
+      setTimeout(() => {
       li.remove();
       guardarTareas();
+      }, 300); // el tiempo debe coincidir con la animación CSS
     });
+
 
     //Evento: marcar tarea como completada
     li.addEventListener('click', (e) => {
-      e.stopPropagation
-      li.firstChild.classList.toggle('completado');
-      guardarTareas();
+    e.stopPropagation();
+    li.classList.toggle('completado');
+    guardarTareas();
     });
 
     li.appendChild(botonEliminar);
@@ -103,9 +107,10 @@ botonAgregar.addEventListener('click', () => {
 
 
     //Evento: tachar tarea
-    li.addEventListener('click', () => {
-      li.classList.toggle('completado');
-      guardarTareas();
+  li.addEventListener('click', (e) => {
+    e.stopPropagation();
+    li.classList.toggle('completado');
+    guardarTareas();
     });
 
     li.appendChild(botonEliminar);
