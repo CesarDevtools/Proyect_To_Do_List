@@ -2,6 +2,11 @@ const tareaInput = document.getElementById('tareaInput');
 const botonAgregar = document.getElementById('botonAgregar');
 const listaTareas = document.getElementById('listaTareas');
 const mensajeVacio = document.getElementById('mensajeVacio');
+const botonFiltrar = document.getElementById('botonFiltrar')
+const filtrosOpciones = document.getElementById('filtrosOpciones');
+const filtroTodas = document.getElementById('filtroTodas')
+const filtroCompletadas = document.getElementById('filtroCompletadas')
+const filtroPendientes = document.getElementById('filtroPendientes')
 
 // Función: muestra u oculta el mensaje de lista vacía
 function actualizarMensajeVacio() {
@@ -45,7 +50,7 @@ function cargarTareas() {
     li.classList.add("fade-in");
     li.style.animationDelay = `${index * 100}ms`;
 
-    // Elimina la clase fade-in al terminar la animación de entrada
+    // Elimina la clase fade-in al terminar la animación de entrada, para que luego puedo fucionar la animacion al eliminar
     li.addEventListener('animationend', function handler(e) {
       if (e.animationName === "fadeInSlide") {
       li.classList.remove('fade-in');
@@ -139,4 +144,53 @@ tareaInput.addEventListener('keydown', (e) => {
 
 
 
+//Evento: Mostrar menu de filtros
+botonFiltrar.addEventListener('click', (e) => {    
+  e.stopPropagation();
+  filtrosOpciones.classList.toggle('d-none');
+});
 
+//Evento: Oculta el menú si haces click fuera
+document.addEventListener('click', (e) => {
+  if (!botonFiltrar.contains(e.target) && !filtrosOpciones.contains(e.target)) {
+    filtrosOpciones.classList.add('d-none');
+  }
+});
+
+//Evento: muestra todas las tareas
+filtroTodas.addEventListener('click', () => {
+  let algunoOculto = false;
+  const items = listaTareas.querySelectorAll('li');
+  items.forEach(li => {
+    if (li.classList.contains('d-none')) {
+      li.classList.remove('d-none');
+      algunoOculto = true;
+    }
+  });
+  // Si ninguno tenía d-none, no hace nada extra
+});
+
+//Evento: muestra solo las tareas completadas
+filtroCompletadas.addEventListener('click', () => {
+  const items = listaTareas.querySelectorAll('li');
+  items.forEach(li => {
+    if (li.classList.contains('completado')) {
+      li.classList.remove('d-none');
+    } else {
+      li.classList.add('d-none');
+    }
+  });
+});
+
+
+//Evento: muestra solo las tareas pendientes
+filtroPendientes.addEventListener('click', () => {
+  const items = listaTareas.querySelectorAll('li');
+  items.forEach(li => {
+    if (li.classList.contains('completado')) {
+      li.classList.add('d-none');
+    } else {
+      li.classList.remove('d-none');
+   }
+  });
+});

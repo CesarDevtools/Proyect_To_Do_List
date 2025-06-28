@@ -14,14 +14,26 @@
       <div class="col-md-8">
 
         <div class="card shadow-sm">
+          
+          <!--Titulo y boton de filtrado-->
           <div class="card-body">
             <h2 class="text-center mb-4">📝 Mis Tareas</h2>
+            <button type="button" id="botonFiltrar" class="btn btn-warning float-start mb-4 botonFiltrar">Filtrar</button>
+        
+          <!--Opciones de filtrado-->
+            <div id="filtrosOpciones" class="btn-group ms-2 d-none" role="group">
+              <button id="filtroTodas" type="button" class="btn btn-outline-secondary">Todas</button>
+              <button id="filtroCompletadas" type="button" class="btn btn-outline-success">Completadas</button>
+              <button id="filtroPendientes" type="button" class="btn btn-outline-danger">Pendientes</button>
+            </div>
 
+            <!--Input y boton de agregado-->
             <div class="input-group mb-3">
               <input type="text" id="tareaInput" class="form-control" placeholder="Escribe una tarea...">
               <button id="botonAgregar" class="btn btn-primary">Agregar</button>
             </div>
 
+            <!--Lista de tareas y mensaje-->
             <ul id="listaTareas" class="list-group"></ul>
             <p id="mensajeVacio" class="text-center text-muted mt-3 mostrar">No tienes ninguna tarea</p>
           </div>
