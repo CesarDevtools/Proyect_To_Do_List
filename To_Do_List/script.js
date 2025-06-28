@@ -29,6 +29,7 @@ function guardarTareas() {
   });
   localStorage.setItem('tareas', JSON.stringify(tareasArray));
   actualizarMensajeVacio();
+  actualizarContadorTareas(); //Llamado para actualizar el contador.
 };
 
 // Función: cargar tareas guardadas
@@ -85,6 +86,7 @@ function cargarTareas() {
   });
 
   actualizarMensajeVacio();
+  actualizarContadorTareas();
 };
 
 
@@ -194,3 +196,20 @@ filtroPendientes.addEventListener('click', () => {
    }
   });
 });
+
+
+//Funcion: Actualizar contador de tareas
+
+function actualizarContadorTareas() {
+  const items = listaTareas.querySelectorAll('li');
+  let completadas = 0;
+  let pendientes = 0;
+  items.forEach(li => {
+    if (li.classList.contains('completado')) {
+      completadas++;
+    } else {
+      pendientes++;
+    }
+  });
+  contadorTareas.textContent = `Pendientes: ${pendientes} | Completadas: ${completadas}`;
+};

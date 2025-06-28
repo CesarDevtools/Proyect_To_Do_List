@@ -1,4 +1,8 @@
 
+li span {
+  cursor: pointer;
+}
+
 /*Animacion al tachar*/
 li.completado span {
   text-decoration: line-through;
