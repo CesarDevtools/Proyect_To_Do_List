@@ -46,6 +46,17 @@ function cargarTareas() {
 
   tareasGuardadas.forEach((tareaObj, index) => {
     const li = document.createElement("li");
+    li.setAttribute('draggable', true);
+    
+    li.addEventListener('dragstart', (e) => {
+      li.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      });
+
+    li.addEventListener('dragend', () => {
+      li.classList.remove('dragging');
+      });
+      
     const spanTexto = document.createElement("span");
     spanTexto.textContent = tareaObj.texto;
     li.appendChild(spanTexto);
@@ -104,7 +115,21 @@ function actualizarContadorTareas() {
     }
   });
   contadorTareas.textContent = `Pendientes: ${pendientes} | Completadas: ${completadas}`;
-}
+};
+
+// Función auxiliar
+function getDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('li:not(.dragging)')];
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: -Infinity }).element;
+};
 
 
 // =======================
@@ -119,6 +144,16 @@ botonAgregar.addEventListener('click', () => {
   const tarea = tareaInput.value.trim();
   if (tarea !== "") {
     const li = document.createElement("li");
+    li.setAttribute('draggable', true);
+
+li.addEventListener('dragstart', (e) => {
+  li.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+});
+
+li.addEventListener('dragend', () => {
+  li.classList.remove('dragging');
+});
     const spanTexto = document.createElement("span");
     spanTexto.textContent = tarea;
     li.appendChild(spanTexto);
@@ -200,3 +235,21 @@ filtroPendientes.addEventListener('click', () => {
     }
   });
 });
+
+// Permitir soltar sobre la lista
+listaTareas.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  const dragging = document.querySelector('.dragging');
+  const afterElement = getDragAfterElement(listaTareas, e.clientY);
+  if (afterElement == null) {
+    listaTareas.appendChild(dragging);
+  } else {
+    listaTareas.insertBefore(dragging, afterElement);
+  }
+});
+
+// Guardar el nuevo orden al soltar
+listaTareas.addEventListener('drop', () => {
+  guardarTareas();
+});
+
