@@ -146,6 +146,21 @@ function cargarTareas() {
         li.appendChild(nuevaDescripcion);
       }
       li.classList.add("list-group-item", "d-flex", "flex-column", "align-items-start");
+
+      const btnEliminar = document.createElement("button");
+      btnEliminar.textContent = "Eliminar";
+      btnEliminar.className = "btn btn-sm position-absolute top-0 end-0  text-danger";
+      btnEliminar.style.zIndex = "2";
+      btnEliminar.addEventListener('click', (e) => {
+        e.stopPropagation();
+        li.classList.add('eliminando');
+        setTimeout(() => {
+          li.remove();
+          guardarTareas();
+        }, 300);
+      });
+      li.appendChild(btnEliminar);
+
       guardarTareas();
     });
   });
@@ -180,10 +195,11 @@ function cargarTareas() {
     if (tareaObj.completado) li.classList.add("completado");
 
     // Botón eliminar
-    const botonEliminar = document.createElement("button");
-    botonEliminar.textContent = "🗑";
-    botonEliminar.classList.add("btn", "btn-outline-danger", "btn-sm", "ms-auto");
-    botonEliminar.addEventListener('click', (e) => {
+    const btnEliminar = document.createElement("button");
+    btnEliminar.textContent = "Eliminar"; // equis
+    btnEliminar.className = "btn btn-sm position-absolute top-0 end-0 text-danger";
+    btnEliminar.style.zIndex = "2";
+    btnEliminar.addEventListener('click', (e) => {
       e.stopPropagation();
       li.classList.add('eliminando');
       setTimeout(() => {
@@ -199,7 +215,8 @@ function cargarTareas() {
       guardarTareas();
     });
 
-    li.appendChild(botonEliminar);
+    li.classList.add("position-relative");
+    li.appendChild(btnEliminar);
     listaTareas.appendChild(li);
   });
 
@@ -236,6 +253,8 @@ function getDragAfterElement(container, y) {
   }, { offset: -Infinity }).element;
 };
 
+// Colores de categorías
+// Esta función devuelve la clase CSS correspondiente a cada categoría
 function obtenerClaseCategoria(categoria) {
   switch (categoria) {
     case 'Hogar':
@@ -320,6 +339,7 @@ botonAgregar.addEventListener('click', () => {
     li.appendChild(inputDescripcion);
     li.appendChild(btnGuardar);
 
+    // Evento para guardar cambios
     btnGuardar.addEventListener('click', () => {
       li.setAttribute('draggable', true); // Reactiva drag and drop
       guardarTareas();
@@ -358,6 +378,21 @@ botonAgregar.addEventListener('click', () => {
         li.appendChild(nuevaDescripcion);
       }
       li.classList.add("list-group-item", "d-flex", "flex-column", "align-items-start");
+
+      const btnEliminar = document.createElement("button");
+      btnEliminar.textContent = "Eliminar";
+      btnEliminar.className = "btn btn-sm position-absolute top-0 end-0  text-danger";
+      btnEliminar.style.zIndex = "2";
+      btnEliminar.addEventListener('click', (e) => {
+        e.stopPropagation();
+        li.classList.add('eliminando');
+        setTimeout(() => {
+          li.remove();
+          guardarTareas();
+        }, 300);
+      });
+      li.appendChild(btnEliminar);
+
       guardarTareas();
     });
   });
@@ -391,10 +426,11 @@ botonAgregar.addEventListener('click', () => {
     li.classList.add("list-group-item", "d-flex", "flex-column", "align-items-start");
 
     // Botón eliminar
-    const botonEliminar = document.createElement("button");
-    botonEliminar.textContent = "🗑";
-    botonEliminar.classList.add("btn", "btn-outline-danger", "btn-sm", "ms-auto");
-    botonEliminar.addEventListener('click', (e) => {
+    const btnEliminar = document.createElement("button");
+    btnEliminar.textContent = "Eliminar"; // equis
+    btnEliminar.className = "btn btn-sm position-absolute top-0 end-0  text-danger";
+    btnEliminar.style.zIndex = "2";
+    btnEliminar.addEventListener('click', (e) => {
       e.stopPropagation();
       li.classList.add('eliminando');
       setTimeout(() => {
@@ -410,7 +446,8 @@ botonAgregar.addEventListener('click', () => {
       guardarTareas();
     });
 
-    li.appendChild(botonEliminar);
+    li.classList.add("position-relative");
+    li.appendChild(btnEliminar);
     listaTareas.appendChild(li);
 
     // Limpiar inputs
