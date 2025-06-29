@@ -12,7 +12,7 @@ const filtroCompletadas = document.getElementById('filtroCompletadas');
 const filtroPendientes = document.getElementById('filtroPendientes');
 const tareaTitulo = document.getElementById('tareaTitulo');
 const tareaCategoria = document.getElementById('tareaCategoria');
-
+const contadorTareas = document.getElementById('contadorTareas');
 
 // =======================
 // Funciones principales
@@ -65,6 +65,90 @@ function cargarTareas() {
     li.addEventListener('dragend', () => {
       li.classList.remove('dragging');
     });
+
+  // Doble click para editar
+  li.addEventListener('dblclick', () => {
+    li.setAttribute('draggable', false);
+    // Obtener los valores actuales
+    const divSuperior = li.querySelector('div');
+    const spanTitulo = divSuperior.querySelector('span.fw-bold');
+    const spanCategoria = divSuperior.querySelector('span.badge');
+    const divDescripcion = li.querySelector('div.small');
+
+    // Crear inputs para edición
+    const inputTitulo = document.createElement('input');
+    inputTitulo.type = 'text';
+    inputTitulo.value = spanTitulo.textContent;
+    inputTitulo.className = 'form-control mb-2';
+
+    const selectCategoria = document.createElement('select');
+    selectCategoria.className = 'form-select mb-2';
+    ['Hogar', 'Salud', 'Trabajo', 'Importante'].forEach(cat => {
+      const option = document.createElement('option');
+      option.value = cat;
+      option.textContent = cat;
+      if (spanCategoria.textContent === cat) option.selected = true;
+      selectCategoria.appendChild(option);
+    });
+
+    const inputDescripcion = document.createElement('input');
+    inputDescripcion.type = 'text';
+    inputDescripcion.value = divDescripcion ? divDescripcion.textContent : '';
+    inputDescripcion.className = 'form-control mb-2';
+
+    // Botón guardar
+    const btnGuardar = document.createElement('button');
+    btnGuardar.textContent = 'Guardar';
+    btnGuardar.className = 'btn btn-success btn-sm';
+
+    // Limpiar el li y agregar los inputs
+    li.innerHTML = '';
+    li.appendChild(inputTitulo);
+    li.appendChild(selectCategoria);
+    li.appendChild(inputDescripcion);
+    li.appendChild(btnGuardar);
+
+    btnGuardar.addEventListener('click', () => {
+      li.setAttribute('draggable', true); // Reactiva drag and drop
+      guardarTareas();
+      // Validar
+      if (inputTitulo.value.trim() === '' || selectCategoria.value === '') {
+        alert('Título y categoría son obligatorios');
+        return;
+      }
+      // Actualizar valores
+      spanTitulo.textContent = inputTitulo.value.trim();
+      spanCategoria.textContent = selectCategoria.value;
+      spanCategoria.className = `badge ms-2 ${obtenerClaseCategoria(selectCategoria.value)}`;
+      if (inputDescripcion.value.trim() !== '') {
+        if (!divDescripcion) {
+          const nuevaDescripcion = document.createElement('div');
+          nuevaDescripcion.className = 'small text-muted mt-1';
+          nuevaDescripcion.textContent = inputDescripcion.value.trim();
+          li.appendChild(nuevaDescripcion);
+        } else {
+          divDescripcion.textContent = inputDescripcion.value.trim();
+        }
+      } else if (divDescripcion) {
+        divDescripcion.remove();
+      }
+
+      // Restaurar estructura original
+      const divSuperiorNuevo = document.createElement('div');
+      divSuperiorNuevo.appendChild(spanTitulo);
+      divSuperiorNuevo.appendChild(spanCategoria);
+      li.innerHTML = '';
+      li.appendChild(divSuperiorNuevo);
+      if (inputDescripcion.value.trim() !== '') {
+        const nuevaDescripcion = document.createElement('div');
+        nuevaDescripcion.className = 'small text-muted mt-1';
+        nuevaDescripcion.textContent = inputDescripcion.value.trim();
+        li.appendChild(nuevaDescripcion);
+      }
+      li.classList.add("list-group-item", "d-flex", "flex-column", "align-items-start");
+      guardarTareas();
+    });
+  });
 
     // Título
     const spanTitulo = document.createElement("span");
@@ -193,6 +277,90 @@ botonAgregar.addEventListener('click', () => {
     li.addEventListener('dragend', () => {
       li.classList.remove('dragging');
     });
+  
+  // Evento para editar tarea al hacer doble clic
+  li.addEventListener('dblclick', () => {
+    li.setAttribute('draggable', false);
+    // Obtener los valores actuales
+    const divSuperior = li.querySelector('div');
+    const spanTitulo = divSuperior.querySelector('span.fw-bold');
+    const spanCategoria = divSuperior.querySelector('span.badge');
+    const divDescripcion = li.querySelector('div.small');
+
+    // Crear inputs para edición
+    const inputTitulo = document.createElement('input');
+    inputTitulo.type = 'text';
+    inputTitulo.value = spanTitulo.textContent;
+    inputTitulo.className = 'form-control mb-2';
+
+    const selectCategoria = document.createElement('select');
+    selectCategoria.className = 'form-select mb-2';
+    ['Hogar', 'Salud', 'Trabajo', 'Importante'].forEach(cat => {
+      const option = document.createElement('option');
+      option.value = cat;
+      option.textContent = cat;
+      if (spanCategoria.textContent === cat) option.selected = true;
+      selectCategoria.appendChild(option);
+    });
+
+    const inputDescripcion = document.createElement('input');
+    inputDescripcion.type = 'text';
+    inputDescripcion.value = divDescripcion ? divDescripcion.textContent : '';
+    inputDescripcion.className = 'form-control mb-2';
+
+    // Botón guardar
+    const btnGuardar = document.createElement('button');
+    btnGuardar.textContent = 'Guardar';
+    btnGuardar.className = 'btn btn-success btn-sm';
+
+    // Limpiar el li y agregar los inputs
+    li.innerHTML = '';
+    li.appendChild(inputTitulo);
+    li.appendChild(selectCategoria);
+    li.appendChild(inputDescripcion);
+    li.appendChild(btnGuardar);
+
+    btnGuardar.addEventListener('click', () => {
+      li.setAttribute('draggable', true); // Reactiva drag and drop
+      guardarTareas();
+      // Validar
+      if (inputTitulo.value.trim() === '' || selectCategoria.value === '') {
+        alert('Título y categoría son obligatorios');
+        return;
+      }
+      // Actualizar valores
+      spanTitulo.textContent = inputTitulo.value.trim();
+      spanCategoria.textContent = selectCategoria.value;
+      spanCategoria.className = `badge ms-2 ${obtenerClaseCategoria(selectCategoria.value)}`;
+      if (inputDescripcion.value.trim() !== '') {
+        if (!divDescripcion) {
+          const nuevaDescripcion = document.createElement('div');
+          nuevaDescripcion.className = 'small text-muted mt-1';
+          nuevaDescripcion.textContent = inputDescripcion.value.trim();
+          li.appendChild(nuevaDescripcion);
+        } else {
+          divDescripcion.textContent = inputDescripcion.value.trim();
+        }
+      } else if (divDescripcion) {
+        divDescripcion.remove();
+      }
+
+      // Restaurar estructura original
+      const divSuperiorNuevo = document.createElement('div');
+      divSuperiorNuevo.appendChild(spanTitulo);
+      divSuperiorNuevo.appendChild(spanCategoria);
+      li.innerHTML = '';
+      li.appendChild(divSuperiorNuevo);
+      if (inputDescripcion.value.trim() !== '') {
+        const nuevaDescripcion = document.createElement('div');
+        nuevaDescripcion.className = 'small text-muted mt-1';
+        nuevaDescripcion.textContent = inputDescripcion.value.trim();
+        li.appendChild(nuevaDescripcion);
+      }
+      li.classList.add("list-group-item", "d-flex", "flex-column", "align-items-start");
+      guardarTareas();
+    });
+  });
 
     // Título
     const spanTitulo = document.createElement("span");
@@ -262,6 +430,18 @@ tareaInput.addEventListener('keydown', (e) => {
   }
 });
 
+tareaTitulo.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    botonAgregar.click();
+  }
+});
+
+tareaCategoria.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    botonAgregar.click();
+  }
+});
+
 // Mostrar menú de filtros
 botonFiltrar.addEventListener('click', (e) => {
   e.stopPropagation();
@@ -320,3 +500,22 @@ listaTareas.addEventListener('drop', () => {
   guardarTareas();
 });
 
+
+// Evento Eliminar
+menuList.querySelector('.eliminar-tarea').addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  li.classList.add('eliminando');
+  setTimeout(() => {
+    li.remove();
+    guardarTareas();
+  }, 300);
+});
+
+// Evento Editar (puedes personalizar la función)
+menuList.querySelector('.editar-tarea').addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  // Aquí puedes abrir un modal o rellenar los inputs para editar la tarea
+  alert('Función de editar pendiente de implementar');
+});
