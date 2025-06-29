@@ -10,6 +10,8 @@ const filtrosOpciones = document.getElementById('filtrosOpciones');
 const filtroTodas = document.getElementById('filtroTodas');
 const filtroCompletadas = document.getElementById('filtroCompletadas');
 const filtroPendientes = document.getElementById('filtroPendientes');
+const tareaTitulo = document.getElementById('tareaTitulo');
+const tareaCategoria = document.getElementById('tareaCategoria');
 
 
 // =======================
@@ -29,55 +31,74 @@ function actualizarMensajeVacio() {
 function guardarTareas() {
   const tareasArray = [];
   listaTareas.querySelectorAll('li').forEach(li => {
+    const divSuperior = li.querySelector('div');
+    const spanTitulo = divSuperior ? divSuperior.querySelector('span.fw-bold') : null;
+    const spanCategoria = divSuperior ? divSuperior.querySelector('span.badge') : null;
+    const divDescripcion = li.querySelector('div.small');
     tareasArray.push({
-      texto: li.querySelector('span').textContent,
+      titulo: spanTitulo ? spanTitulo.textContent : '',
+      categoria: spanCategoria ? spanCategoria.textContent : '',
+      descripcion: divDescripcion ? divDescripcion.textContent : '',
       completado: li.classList.contains('completado')
     });
   });
   localStorage.setItem('tareas', JSON.stringify(tareasArray));
   actualizarMensajeVacio();
   actualizarContadorTareas();
-}
+};
 
 // Carga tareas guardadas desde localStorage
 function cargarTareas() {
+  listaTareas.innerHTML = ""; // Limpia la lista antes de cargar
   const tareasGuardadas = JSON.parse(localStorage.getItem('tareas'));
   if (!tareasGuardadas) return actualizarMensajeVacio();
 
   tareasGuardadas.forEach((tareaObj, index) => {
     const li = document.createElement("li");
     li.setAttribute('draggable', true);
-    
+
+    // Drag & drop
     li.addEventListener('dragstart', (e) => {
       li.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
-      });
-
+    });
     li.addEventListener('dragend', () => {
       li.classList.remove('dragging');
-      });
-      
-    const spanTexto = document.createElement("span");
-    spanTexto.textContent = tareaObj.texto;
-    li.appendChild(spanTexto);
-
-    li.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
-    if (tareaObj.completado) li.classList.add("completado");
-
-    // Animación de entrada
-    li.classList.add("fade-in");
-    li.style.animationDelay = `${index * 100}ms`;
-    li.addEventListener('animationend', function handler(e) {
-      if (e.animationName === "fadeInSlide") {
-        li.classList.remove('fade-in');
-        li.removeEventListener('animationend', handler);
-      }
     });
+
+    // Título
+    const spanTitulo = document.createElement("span");
+    spanTitulo.textContent = tareaObj.titulo || '';
+    spanTitulo.classList.add("fw-bold", "me-2");
+
+    // Categoría
+    const spanCategoria = document.createElement("span");
+    spanCategoria.textContent = tareaObj.categoria || '';
+    spanCategoria.className = `badge ms-2 ${obtenerClaseCategoria(tareaObj.categoria)}`;
+
+    // Línea superior: título + categoría
+    const divSuperior = document.createElement("div");
+    divSuperior.appendChild(spanTitulo);
+    divSuperior.appendChild(spanCategoria);
+
+    // Descripción (opcional)
+    let divDescripcion = null;
+    if (tareaObj.descripcion) {
+      divDescripcion = document.createElement("div");
+      divDescripcion.textContent = tareaObj.descripcion;
+      divDescripcion.classList.add("small", "text-muted", "mt-1");
+    }
+
+    li.appendChild(divSuperior);
+    if (divDescripcion) li.appendChild(divDescripcion);
+
+    li.classList.add("list-group-item", "d-flex", "flex-column", "align-items-start");
+    if (tareaObj.completado) li.classList.add("completado");
 
     // Botón eliminar
     const botonEliminar = document.createElement("button");
     botonEliminar.textContent = "🗑";
-    botonEliminar.classList.add("btn", "btn-outline-danger", "btn-sm");
+    botonEliminar.classList.add("btn", "btn-outline-danger", "btn-sm", "ms-auto");
     botonEliminar.addEventListener('click', (e) => {
       e.stopPropagation();
       li.classList.add('eliminando');
@@ -100,7 +121,7 @@ function cargarTareas() {
 
   actualizarMensajeVacio();
   actualizarContadorTareas();
-}
+};
 
 // Actualiza el contador de tareas
 function actualizarContadorTareas() {
@@ -131,6 +152,21 @@ function getDragAfterElement(container, y) {
   }, { offset: -Infinity }).element;
 };
 
+function obtenerClaseCategoria(categoria) {
+  switch (categoria) {
+    case 'Hogar':
+      return 'bg-purple text-white';      // Morado
+    case 'Salud':
+      return 'bg-success text-white';     // Verde
+    case 'Trabajo':
+      return 'bg-info text-dark';         // Turquesa
+    case 'Importante':
+      return 'bg-danger text-white';      // Rojo
+    default:
+      return 'bg-secondary text-white';
+  }
+};
+
 
 // =======================
 // Eventos principales
@@ -141,28 +177,55 @@ window.addEventListener('load', cargarTareas);
 
 // Agregar tarea
 botonAgregar.addEventListener('click', () => {
-  const tarea = tareaInput.value.trim();
-  if (tarea !== "") {
+  const titulo = tareaTitulo.value.trim();
+  const categoria = tareaCategoria.value;
+  const descripcion = tareaInput.value.trim();
+
+  if (titulo !== "" && categoria !== "") {
     const li = document.createElement("li");
     li.setAttribute('draggable', true);
 
-li.addEventListener('dragstart', (e) => {
-  li.classList.add('dragging');
-  e.dataTransfer.effectAllowed = 'move';
-});
+    // Drag & drop
+    li.addEventListener('dragstart', (e) => {
+      li.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    li.addEventListener('dragend', () => {
+      li.classList.remove('dragging');
+    });
 
-li.addEventListener('dragend', () => {
-  li.classList.remove('dragging');
-});
-    const spanTexto = document.createElement("span");
-    spanTexto.textContent = tarea;
-    li.appendChild(spanTexto);
-    li.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+    // Título
+    const spanTitulo = document.createElement("span");
+    spanTitulo.textContent = titulo;
+    spanTitulo.classList.add("fw-bold", "me-2");
+
+    // Categoría
+    const spanCategoria = document.createElement("span");
+    spanCategoria.textContent = categoria;
+    spanCategoria.className = `badge ms-2 ${obtenerClaseCategoria(categoria)}`;
+
+    // Línea superior: título + categoría
+    const divSuperior = document.createElement("div");
+    divSuperior.appendChild(spanTitulo);
+    divSuperior.appendChild(spanCategoria);
+
+    // Descripción (opcional)
+    let divDescripcion = null;
+    if (descripcion) {
+      divDescripcion = document.createElement("div");
+      divDescripcion.textContent = descripcion;
+      divDescripcion.classList.add("small", "text-muted", "mt-1");
+    }
+
+    li.appendChild(divSuperior);
+    if (divDescripcion) li.appendChild(divDescripcion);
+
+    li.classList.add("list-group-item", "d-flex", "flex-column", "align-items-start");
 
     // Botón eliminar
     const botonEliminar = document.createElement("button");
     botonEliminar.textContent = "🗑";
-    botonEliminar.classList.add("btn", "btn-outline-danger", "btn-sm");
+    botonEliminar.classList.add("btn", "btn-outline-danger", "btn-sm", "ms-auto");
     botonEliminar.addEventListener('click', (e) => {
       e.stopPropagation();
       li.classList.add('eliminando');
@@ -181,10 +244,14 @@ li.addEventListener('dragend', () => {
 
     li.appendChild(botonEliminar);
     listaTareas.appendChild(li);
+
+    // Limpiar inputs
+    tareaTitulo.value = "";
+    tareaCategoria.value = "";
     tareaInput.value = "";
     guardarTareas();
   } else {
-    alert('Campo vacío!');
+    alert('Título y categoría son obligatorios');
   }
 });
 

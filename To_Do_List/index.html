@@ -9,17 +9,15 @@
 </head>
 <body class="bg-light">
 
-  <!--contenedor principal-->
-  <div class="container-fluid py-4 min-vh-100 position-relative">
-    <div class="row justify-content-center">
-      <div class="col-md-8">
 
-        <div class="card shadow-sm">
+    <div class="row justify-content-center">
+      <div class="col-md-100">
+        <div class="card shadow-sm min-vh-100">
           
         <!--Contenedor del contenido principal-->
           <!--Titulo y boton de filtrado-->
           <div class="card-body">
-            <h2 class="text-center mb-4">📝 Mis Tareas</h2>
+            <h2 class="text-start mb-5">📝 Mis Tareas</h2>
             <button type="button" id="botonFiltrar" class="btn btn-warning float-start mb-4 botonFiltrar">Filtrar</button>
         
           <!--Opciones de filtrado-->
@@ -30,12 +28,30 @@
             </div>
 
             <!--Contador de tareas-->
-             <div id="contadorTareas" class="position-absolute end-0 bottom-0 m-4 text-muted small"></div>
-
-            <!--Input y boton de agregado-->
-            <div class="input-group mb-3">
-              <input type="text" id="tareaInput" class="form-control" placeholder="Escribe una tarea...">
-              <button id="botonAgregar" class="btn btn-primary">Agregar</button>
+             <!--Input y boton de agregado-->
+            <div class="mb-3">
+              <div class="row g-2 mb-2">
+                <div class="col">
+                  <input type="text" id="tareaTitulo" class="form-control" placeholder="Título de la tarea">
+                </div>
+                <div class="col-auto">
+                  <select id="tareaCategoria" class="form-select">
+                    <option value="" disabled selected>Selecciona una categoría</option>
+                    <option value="Hogar">Hogar</option>
+                    <option value="Salud">Salud</option>
+                    <option value="Trabajo">Trabajo</option>
+                    <option value="Importante">Importante</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row g-2">
+                <div class="col">
+                  <input type="text" id="tareaInput" class="form-control" placeholder="Descripción (opcional)">
+                </div>
+                <div class="col-auto">
+                  <button id="botonAgregar" class="btn btn-primary w-100">Agregar</button>
+                </div>
+              </div>
             </div>
 
             <!--Lista de tareas y mensaje-->
