@@ -108,6 +108,15 @@ function cargarTareas() {
     li.appendChild(inputDescripcion);
     li.appendChild(btnGuardar);
 
+    // Keydown para guardar al presionar Enter
+    [inputTitulo, selectCategoria, inputDescripcion].forEach(input => {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          btnGuardar.click();
+        }
+      });
+    });
+
     btnGuardar.addEventListener('click', () => {
       li.setAttribute('draggable', true); // Reactiva drag and drop
       guardarTareas();
@@ -271,6 +280,15 @@ function obtenerClaseCategoria(categoria) {
 };
 
 
+
+
+
+
+
+
+
+
+
 // =======================
 // Eventos principales
 // =======================
@@ -338,6 +356,15 @@ botonAgregar.addEventListener('click', () => {
     li.appendChild(selectCategoria);
     li.appendChild(inputDescripcion);
     li.appendChild(btnGuardar);
+
+    // Keydown para guardar al presionar Enter
+    [inputTitulo, selectCategoria, inputDescripcion].forEach(input => {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          btnGuardar.click();
+        }
+      });
+    });
 
     // Evento para guardar cambios
     btnGuardar.addEventListener('click', () => {
