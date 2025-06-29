@@ -109,7 +109,7 @@ function cargarTareas() {
     li.appendChild(btnGuardar);
 
     // Keydown para guardar al presionar Enter
-    [inputTitulo, selectCategoria, inputDescripcion].forEach(input => {
+    [inputTitulo, inputDescripcion].forEach(input => {
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           btnGuardar.click();
@@ -358,7 +358,7 @@ botonAgregar.addEventListener('click', () => {
     li.appendChild(btnGuardar);
 
     // Keydown para guardar al presionar Enter
-    [inputTitulo, selectCategoria, inputDescripcion].forEach(input => {
+    [inputTitulo, inputDescripcion].forEach(input => {
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           btnGuardar.click();
@@ -500,11 +500,7 @@ tareaTitulo.addEventListener('keydown', (e) => {
   }
 });
 
-tareaCategoria.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    botonAgregar.click();
-  }
-});
+
 
 // Mostrar menú de filtros
 botonFiltrar.addEventListener('click', (e) => {
