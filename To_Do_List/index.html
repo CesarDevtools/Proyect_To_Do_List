@@ -1,40 +1,55 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+<>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>TaskPlanifier</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <head>
-  <link rel="icon" type="image/x-icon" href="https://s3u.tmimgcdn.com/u37752224/0bf489b0d6bd227dec4e775253c1726a.gif">
 </head>
-</head>
-<body class="bg-light">
+<body class=" p-3">
 
+ 
+<!-- Header -->
+ <header>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary mb-5 shadow-sm rounded">
+    <div class="container-fluid">
+      <span class="navbar-brand fw-bold fs-3 fst-italic">TaskPlanifier</span>
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-outline-danger" id="signOutBtn" type="button">Sign out</button>
 
-    <div class="row justify-content-center">
-      <div class="col-md-100">
-        <div class="card shadow-sm min-vh-100">
-          
-        <!--Contenedor del contenido principal-->
-          <!--Titulo y boton de filtrado-->
-          <div class="card-body">
-            <h2 class="text-start mb-5 titulo-cursiva">TaskPlanifier✏️</h2>
-            <button type="button" id="botonFiltrar" class="btn btn-warning float-start mb-4 botonFiltrar">Filtrar</button>
+        <div class="dropdown">
+          <button class="btn btn-outline-dark dropdown-toggle" type="button" id="themeDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            Tema
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="themeDropdown">
+            <li><a class="dropdown-item" href="#" id="themeLight">Light</a></li>
+            <li><a class="dropdown-item" href="#" id="themeDark">Dark</a></li>
+          </ul>
+        </div>
         
-          <!--Opciones de filtrado-->
-            <div id="filtrosOpciones" class="btn-group ms-2 d-none" role="group">
-              <button id="filtroTodas" type="button" class="btn btn-outline-secondary">Todas</button>
-              <button id="filtroCompletadas" type="button" class="btn btn-outline-success">Completadas</button>
-              <button id="filtroPendientes" type="button" class="btn btn-outline-danger">Pendientes</button>
-            </div>
+      </div>
+    </div>
+  </nav>
+</header>
 
-            <!--Contador de tareas-->
-            <div id="contadorTareas" class="position-absolute end-0 bottom-0 m-4 small"></div>
-             <!--Input y boton de agregado-->
-            <div class="mb-3">
-              <div class="row g-2 mb-2">
+ <main>
+  <!--boton de filtrado-->
+  <button type="button" id="botonFiltrar" class="btn btn-warning float-start mb-4 botonFiltrar">Filtrar</button>
+  
+  <!--Opciones de filtrado-->
+  <div id="filtrosOpciones" class="btn-group ms-2 d-none" role="group">
+     <button id="filtroTodas" type="button" class="btn btn-outline-secondary">Todas</button>
+     <button id="filtroCompletadas" type="button" class="btn btn-outline-success">Completadas</button>
+     <button id="filtroPendientes" type="button" class="btn btn-outline-danger">Pendientes</button>
+  </div>
+
+ <!--Contador de tareas-->
+  <div id="contadorTareas" class="position-absolute end-0 bottom-0 m-4 small"></div>
+
+  <!--Input y boton de agregado-->
+  <div class="mb-3">
+             <div class="row g-2 mb-2">
                 <div class="col">
                   <input type="text" id="tareaTitulo" class="form-control" placeholder="Título de la tarea">
                 </div>
@@ -53,19 +68,17 @@
                   <input type="text" id="tareaInput" class="form-control" placeholder="Descripción (opcional)">
                 </div>
                 <div class="col-auto">
-                  <button id="botonAgregar" class="btn btn-primary w-100">Agregar</button>
+                  <button id="botonAgregar" class="btn btn-primary w-100 mb-5">Agregar</button>
                 </div>
               </div>
-            </div>
+  </div>
 
-            <!--Lista de tareas y mensaje-->
-            <ul id="listaTareas" class="list-group"></ul>
-            <p id="mensajeVacio" class="text-center text-muted mt-3 mostrar">No tienes ninguna tarea</p>
-          </div>
-        </div>
+  <!--Lista de tareas y mensaje-->
+  <ul id="listaTareas" class="list-group list-group-flush"></ul>
+  <p id="mensajeVacio" class="text-center text-muted mt-3 mostrar">No tienes ninguna tarea</p>
 
-      </div>
-    </div>
+</main>          
+        
   
 
   <script src="script.js"></script>

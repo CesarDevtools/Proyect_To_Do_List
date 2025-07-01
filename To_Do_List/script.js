@@ -14,6 +14,17 @@ const tareaTitulo = document.getElementById('tareaTitulo');
 const tareaCategoria = document.getElementById('tareaCategoria');
 const contadorTareas = document.getElementById('contadorTareas');
 
+
+// Restaurar tema guardado
+const temaGuardado = localStorage.getItem('tema');
+if (temaGuardado === 'oscuro') {
+  document.body.classList.remove('bg-white', 'text-dark');
+  document.body.classList.add('bg-dark', 'text-light');
+} else {
+  document.body.classList.remove('bg-dark', 'text-light');
+  document.body.classList.add('bg-white', 'text-dark');
+}
+
 // =======================
 // Funciones principales
 // =======================
@@ -560,22 +571,21 @@ listaTareas.addEventListener('drop', () => {
   guardarTareas();
 });
 
-
-// Evento Eliminar
-menuList.querySelector('.eliminar-tarea').addEventListener('click', (e) => {
+// Cambiar tema claro
+document.getElementById('themeLight').addEventListener('click', function(e) {
   e.preventDefault();
-  e.stopPropagation();
-  li.classList.add('eliminando');
-  setTimeout(() => {
-    li.remove();
-    guardarTareas();
-  }, 300);
+  document.body.classList.remove('bg-dark', 'text-light');
+  document.body.classList.add('bg-white', 'text-dark');
+  localStorage.setItem('tema', 'claro');
 });
 
-// Evento Editar (puedes personalizar la función)
-menuList.querySelector('.editar-tarea').addEventListener('click', (e) => {
+// Cambiar tema oscuro
+document.getElementById('themeDark').addEventListener('click', function(e) {
   e.preventDefault();
-  e.stopPropagation();
-  // Aquí puedes abrir un modal o rellenar los inputs para editar la tarea
-  alert('Función de editar pendiente de implementar');
+  document.body.classList.remove('bg-white', 'text-dark');
+  document.body.classList.add('bg-dark', 'text-light');
+  localStorage.setItem('tema', 'oscuro');
 });
+
+
+
