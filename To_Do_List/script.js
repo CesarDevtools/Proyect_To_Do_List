@@ -23,7 +23,7 @@ if (temaGuardado === 'oscuro') {
 } else {
   document.body.classList.remove('bg-dark', 'text-light');
   document.body.classList.add('bg-white', 'text-dark');
-}
+};
 
 // =======================
 // Funciones principales
@@ -36,7 +36,7 @@ function actualizarMensajeVacio() {
   } else {
     mensajeVacio.classList.remove('mostrar');
   }
-}
+};
 
 // Guarda tareas en localStorage y actualiza contador
 function guardarTareas() {
