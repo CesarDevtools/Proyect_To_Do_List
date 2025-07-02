@@ -31,12 +31,15 @@ if (temaGuardado === 'oscuro') {
 
 // Muestra u oculta el mensaje de lista vacía
 function actualizarMensajeVacio() {
+  const contenedorTareas = document.getElementById('contenedorTareas');
   if (listaTareas.children.length === 0) {
     mensajeVacio.classList.add('mostrar');
+    if (contenedorTareas) contenedorTareas.style.display = 'none';
   } else {
     mensajeVacio.classList.remove('mostrar');
+    if (contenedorTareas) contenedorTareas.style.display = '';
   }
-};
+}
 
 // Guarda tareas en localStorage y actualiza contador
 function guardarTareas() {
