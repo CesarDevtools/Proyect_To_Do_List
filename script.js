@@ -35,7 +35,7 @@ function actualizarMensajeVacio() {
   const vacio = listaTareas.children.length === 0;
   mensajeVacio.classList.toggle('mostrar', vacio);
   if (contenedorTareas) contenedorTareas.style.display = vacio ? 'none' : '';
-}
+};
 
 // Guarda tareas en localStorage y actualiza contador
 function guardarTareas() {
