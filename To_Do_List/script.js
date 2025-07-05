@@ -32,13 +32,9 @@ if (temaGuardado === 'oscuro') {
 // Muestra u oculta el mensaje de lista vacía
 function actualizarMensajeVacio() {
   const contenedorTareas = document.getElementById('contenedorTareas');
-  if (listaTareas.children.length === 0) {
-    mensajeVacio.classList.add('mostrar');
-    if (contenedorTareas) contenedorTareas.style.display = 'none';
-  } else {
-    mensajeVacio.classList.remove('mostrar');
-    if (contenedorTareas) contenedorTareas.style.display = '';
-  }
+  const vacio = listaTareas.children.length === 0;
+  mensajeVacio.classList.toggle('mostrar', vacio);
+  if (contenedorTareas) contenedorTareas.style.display = vacio ? 'none' : '';
 }
 
 // Guarda tareas en localStorage y actualiza contador
@@ -589,6 +585,3 @@ document.getElementById('themeDark').addEventListener('click', function(e) {
   document.body.classList.add('bg-dark', 'text-light');
   localStorage.setItem('tema', 'oscuro');
 });
-
-
-

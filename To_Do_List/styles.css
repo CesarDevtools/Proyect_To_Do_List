@@ -1,12 +1,46 @@
+/* ===========================
+   ESTILOS GENERALES Y BODY
+=========================== */
 body {
   background-color: white;
-  font-family: 'Segoe UI', 'Arial', sans-serif; 
+  font-family: 'Segoe UI', 'Arial', sans-serif;
 }
 
 body.bg-dark {
   background-color: #212529 !important;
 }
 
+/* ===========================
+   NAVBAR Y HEADER
+=========================== */
+/* Navbar fondo y color en modo oscuro */
+.theme-dark .navbar,
+body.bg-dark .navbar {
+  background-color: #212529 !important;
+}
+
+/* Marca de la app (título) en navbar modo oscuro */
+.theme-dark .navbar .navbar-brand,
+body.bg-dark .navbar .navbar-brand {
+  color: #fff !important;
+}
+
+/* Botones del navbar en modo oscuro */
+.theme-dark .navbar .btn,
+body.bg-dark .navbar .btn {
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+.theme-dark .navbar .btn-outline-dark,
+body.bg-dark .navbar .btn-outline-dark,
+.theme-dark .navbar .btn-outline-secondary,
+body.bg-dark .navbar .btn-outline-secondary {
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+/* Dropdown del navbar en modo oscuro */
 .theme-dark .navbar .dropdown-menu,
 body.bg-dark .navbar .dropdown-menu {
   background-color: #23272b !important;
@@ -14,11 +48,7 @@ body.bg-dark .navbar .dropdown-menu {
   border-color: #343a40 !important;
 }
 
-body.bg-dark #contenedorTareas {
-  background-color: #23272b !important;
-  color: #f8f9fa !important;
-  border-color: #343a40 !important;
-}
+/* Dropdown items en modo oscuro */
 .theme-dark .navbar .dropdown-item,
 body.bg-dark .navbar .dropdown-item {
   color: #f8f9fa !important;
@@ -32,35 +62,19 @@ body.bg-dark .navbar .dropdown-item:focus {
   color: #fff !important;
 }
 
-.theme-dark .navbar,
-body.bg-dark .navbar {
-  background-color: #212529 !important;
+/* ===========================
+   CONTENEDOR DE TAREAS
+=========================== */
+body.bg-dark #contenedorTareas {
+  background-color: #23272b !important;
+  color: #f8f9fa !important;
+  border-color: #343a40 !important;
 }
 
-.theme-dark .navbar .navbar-brand,
-body.bg-dark .navbar .navbar-brand {
-  color: #fff !important;
-}
-
-.theme-dark .navbar .btn,
-body.bg-dark .navbar .btn {
-  color: #fff !important;
-  border-color: #fff !important;
-}
-
-.theme-dark .navbar .btn-outline-dark,
-body.bg-dark .navbar .btn-outline-dark {
-  color: #fff !important;
-  border-color: #fff !important;
-}
-
-.theme-dark .navbar .btn-outline-secondary,
-body.bg-dark .navbar .btn-outline-secondary {
-  color: #fff !important;
-  border-color: #fff !important;
-}
- 
-
+/* ===========================
+   LISTA DE TAREAS Y ITEMS
+=========================== */
+/* Items de la lista en modo oscuro */
 .theme-dark .list-group-item,
 body.bg-dark .list-group-item {
   background-color: #23272b !important;
@@ -68,6 +82,15 @@ body.bg-dark .list-group-item {
   border-color: #343a40 !important;
 }
 
+/* Descripción de la tarea en modo oscuro */
+.theme-dark .list-group-item .small,
+body.bg-dark .list-group-item .small {
+  color: #adb5bd !important;
+}
+
+/* ===========================
+   FORMULARIOS E INPUTS
+=========================== */
 .theme-dark .form-control,
 body.bg-dark .form-control,
 .theme-dark .form-select,
@@ -81,13 +104,34 @@ body.bg-dark .form-select {
 body.bg-dark .form-control::placeholder {
   color: #adb5bd !important;
 }
-.theme-dark .list-group-item .small,
-body.bg-dark .list-group-item .small {
-  color: #adb5bd !important;
+
+/* ===========================
+   MENSAJE DE LISTA VACÍA
+=========================== */
+/* Color adaptativo para el mensaje */
+body.bg-dark #mensajeVacio,
+.theme-dark #mensajeVacio {
+  color: #f8f9fa !important;
 }
 
+body.bg-white #mensajeVacio,
+body:not(.bg-dark) #mensajeVacio {
+  color: #222 !important;
+}
 
+/* Aparición elegante del mensaje */
+#mensajeVacio {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
 
+#mensajeVacio.mostrar {
+  opacity: 1;
+}
+
+/* ===========================
+   TÍTULO ELEGANTE
+=========================== */
 .titulo-cursiva {
   font-family: 'Segoe UI', 'Arial', sans-serif;
   font-style: italic;
@@ -102,65 +146,36 @@ body.bg-dark .list-group-item .small {
   box-shadow: none;
 }
 
-
+/* ===========================
+   INTERACCIÓN Y ANIMACIONES
+=========================== */
+/* Cursor en los spans de la lista */
 li span {
   cursor: pointer;
 }
 
-/*Animacion al tachar*/
+/* Animación al tachar tarea completada */
 li.completado span {
   text-decoration: line-through;
   color: #6c757d;
   opacity: 0.7;
   transition: all 0.3s ease;
-  
 }
 
+/* Animación general de los li */
 li {
   transition: all 0.3s ease;
-}
-
-
-/*Animacion al agregar tareas*/
-
-@keyframes fadeInSlide {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-li {
   animation: fadeInSlide 0.3s ease-out;
 }
 
-
-/*Animacion al eliminar una tarea*/
-
+/* Animación al eliminar una tarea */
 .eliminando {
   opacity: 0;
   transform: translateX(50px);
   transition: all 0.3s ease;
 }
 
-
-/*Mensaje sin tareas, aparicion elegante XD */
-#mensajeVacio {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-#mensajeVacio.mostrar {
-  opacity: 1;
-}
-
-
-/*Entrada secuencial de las tareas guardadas*/
-
+/* Animación de aparición de tareas guardadas */
 @keyframes fadeInSlide {
   from {
     opacity: 0;
@@ -177,6 +192,9 @@ li {
   opacity: 0; /* empieza oculta */
 }
 
+/* ===========================
+   UTILIDADES
+=========================== */
 .bg-purple {
   background-color: #6f42c1 !important;
 }
