@@ -63,7 +63,7 @@ function cargarTareas() {
   const tareasGuardadas = JSON.parse(localStorage.getItem('tareas'));
   if (!tareasGuardadas) return actualizarMensajeVacio();
 
-  tareasGuardadas.forEach((tareaObj, index) => {
+  tareasGuardadas.forEach((tareaObj) => {
     const li = document.createElement("li");
     li.setAttribute('draggable', true);
 
