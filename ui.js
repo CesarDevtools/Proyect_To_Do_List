@@ -1,5 +1,5 @@
 // ===================================================
-// UI.JS - FUNCIONES DE INTERFAZ DE USUARIO
+// UI.JS - VIEW (INTERFAZ DE USUARIO Y PRESENTACIÓN)
 // ===================================================
 
 // ELEMENTOS DEL DOM PARA UI
@@ -10,6 +10,173 @@ const filtroCompletadas = document.getElementById('filtroCompletadas');
 const filtroPendientes = document.getElementById('filtroPendientes');
 const themeLight = document.getElementById('themeLight');
 const themeDark = document.getElementById('themeDark');
+const mensajeVacio = document.getElementById('mensajeVacio');
+const contadorTareas = document.getElementById('contadorTareas');
+const contenedorLista = document.getElementById('contenedorTareas');
+
+// ===================================================
+// FUNCIONES DE RENDERIZADO DEL DOM
+// ===================================================
+
+// Obtener el color de la categoría
+function obtenerColorCategoria(categoria) {
+    switch(categoria) {
+        case 'Importante':
+            return 'bg-danger';      // Rojo
+        case 'Trabajo':
+            return 'bg-primary';        // Azul 
+        case 'Salud':
+            return 'bg-success';     // Verde claro
+        case 'Hogar':
+            return 'bg-purple';      // Morado
+        default:
+            return 'bg-secondary';   // Gris
+    }
+}
+
+// Renderizar todas las tareas en la pantalla
+function renderizarLista(lista, configurarEventosCallback) {
+    let listaHTML = '';
+
+    // Crear HTML para cada tarea
+    lista.forEach((tarea, index) => {
+        const colorCategoria = obtenerColorCategoria(tarea.categoria);
+        listaHTML += `
+            <li id="tarea-${index}" draggable="true" class="list-group-item d-flex flex-column align-items-start position-relative ${tarea.completada ? 'completado' : ''}">
+                <div>
+                    <span class="fw-bold me-2 js-tituloTarea" data-index="${index}" style="cursor: pointer;">${tarea.titulo}</span>
+                    <span class="badge ms-2 ${colorCategoria} text-white">${tarea.categoria}</span>
+                </div>
+                <div class="small text-muted mt-1">${tarea.descripcion}</div>
+
+                <div class="dropdown position-absolute" style="top: -14px; right: 5px;">
+                    <button class="btn p-0 border-0 bg-transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.2rem; line-height: 1;">
+                        ...
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <button class="dropdown-item text-primary js-editarTarea" data-index="${index}">
+                                Editar
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item text-danger js-eliminarTarea" data-index="${index}">
+                                Eliminar
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </li>   
+        `;
+    });
+    
+    // Mostrar el HTML en la página
+    document.getElementById('listaTareas').innerHTML = listaHTML;
+    
+    // Configurar eventos de los botones (callback al controlador)
+    if (configurarEventosCallback) {
+        configurarEventosCallback();
+    }
+    
+    // Animar lista completa si hay tareas
+    if (lista.length > 0) {
+        setTimeout(() => {
+            animarListaCompleta();
+        }, 50);
+    }
+}
+
+// Actualizar el contador de tareas en la UI
+function actualizarContadorTareas(estadisticas) {
+    contadorTareas.textContent = `Pendientes: ${estadisticas.pendientes} | Completadas: ${estadisticas.completadas}`;
+}
+
+// Actualizar mensaje vacío y contenedor
+function actualizarMensajeVacio(estaVacia) {
+    if (estaVacia) {   
+        mostrarMensajeVacio();
+        contenedorLista.classList.add('d-none');
+    } else {
+        ocultarMensajeVacio();
+        contenedorLista.classList.remove('d-none');
+    }
+}
+
+// Obtener valores del formulario
+function obtenerDatosFormulario() {
+    const inputTareaTitulo = document.getElementById('tareaTitulo');
+    const inputTareaDescripcion = document.getElementById('tareaDescripcion');
+    const selectTareaCategoria = document.getElementById('tareaCategoria');
+    
+    return {
+        titulo: inputTareaTitulo.value.trim(),
+        descripcion: inputTareaDescripcion.value.trim(),
+        categoria: selectTareaCategoria.value
+    };
+}
+
+// Limpiar el formulario
+function limpiarFormulario() {
+    const inputTareaTitulo = document.getElementById('tareaTitulo');
+    const inputTareaDescripcion = document.getElementById('tareaDescripcion');
+    const selectTareaCategoria = document.getElementById('tareaCategoria');
+    
+    inputTareaTitulo.value = '';
+    inputTareaDescripcion.value = '';
+    selectTareaCategoria.value = '';
+}
+
+// Mostrar formulario de edición
+function mostrarFormularioEdicion(index, tarea, guardarCallback) {
+    const formularioHTML = `
+        <li id="tarea-${index}" draggable="false" class="list-group-item d-flex flex-column align-items-start position-relative">
+            <input type="text" class="form-control mb-2" value="${tarea.titulo}" id="editTitulo-${index}">
+            <select class="form-select mb-2" id="editCategoria-${index}">
+                <option value="Hogar" ${tarea.categoria === 'Hogar' ? 'selected' : ''}>Hogar</option>
+                <option value="Salud" ${tarea.categoria === 'Salud' ? 'selected' : ''}>Salud</option>
+                <option value="Trabajo" ${tarea.categoria === 'Trabajo' ? 'selected' : ''}>Trabajo</option>
+                <option value="Importante" ${tarea.categoria === 'Importante' ? 'selected' : ''}>Importante</option>
+            </select>
+            <input type="text" class="form-control mb-2" value="${tarea.descripcion}" id="editDescripcion-${index}">
+            <button class="btn btn-success btn-sm js-guardarTarea" data-index="${index}">Guardar</button>
+        </li>
+    `;
+    
+    // Encontrar el li específico por su ID y reemplazarlo
+    const tareaElement = document.getElementById(`tarea-${index}`);
+    tareaElement.outerHTML = formularioHTML;
+    
+    // Configurar evento para el botón guardar
+    document.querySelectorAll('.js-guardarTarea').forEach(boton => {
+        boton.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            guardarCallback(index);
+        });
+    });
+    
+    // Configurar eventos de Enter para los inputs de edición
+    configurarEventosEnterEdicion();
+    
+    console.log(`Mostrando formulario de edición para tarea ${index}`);
+}
+
+// Obtener datos del formulario de edición
+function obtenerDatosFormularioEdicion(index) {
+    const nuevoTitulo = document.getElementById(`editTitulo-${index}`).value.trim();
+    const nuevaCategoria = document.getElementById(`editCategoria-${index}`).value;
+    const nuevaDescripcion = document.getElementById(`editDescripcion-${index}`).value.trim();
+    
+    return {
+        titulo: nuevoTitulo,
+        categoria: nuevaCategoria,
+        descripcion: nuevaDescripcion
+    };
+}
+
+// Mostrar mensaje de error
+function mostrarError(mensaje) {
+    alert(mensaje);
+}
 
 // ===================================================
 // FUNCIONES DE FILTRADO
@@ -264,6 +431,16 @@ function inicializarUI() {
     
     // Retornar objeto con funciones de animación y UI
     return {
+        // Funciones de renderizado
+        renderizarLista,
+        actualizarContadorTareas,
+        actualizarMensajeVacio,
+        obtenerDatosFormulario,
+        limpiarFormulario,
+        mostrarFormularioEdicion,
+        obtenerDatosFormularioEdicion,
+        mostrarError,
+        
         // Funciones de animación
         animarAparicionTarea,
         animarEliminacionTarea,
@@ -285,6 +462,14 @@ function inicializarUI() {
 
 // Exportar funciones que podrían necesitarse desde script.js
 export {
+    renderizarLista,
+    actualizarContadorTareas,
+    actualizarMensajeVacio,
+    obtenerDatosFormulario,
+    limpiarFormulario,
+    mostrarFormularioEdicion,
+    obtenerDatosFormularioEdicion,
+    mostrarError,
     aplicarFiltro,
     toggleMenuFiltros,
     ocultarMenuFiltros,

@@ -1,224 +1,179 @@
+// ===================================================
+// SCRIPT.JS - CONTROLLER (COORDINADOR ENTRE MODEL Y VIEW)
+// ===================================================
+
 // IMPORTACIONES
-import { lista, guardarStorage, cargarStorage } from "./lista.js";
+import { 
+    lista, 
+    cargarStorage,
+    agregarTarea,
+    actualizarTarea,
+    eliminarTarea,
+    toggleCompletarTarea,
+    reordenarTareas,
+    obtenerEstadisticas,
+    estaVacia
+} from "./lista.js";
+
 import { inicializarUI } from "./ui.js";
 
 // Variables para las funciones de UI
 let uiFunciones;
 
-// ELEMENTOS DEL DOM
-const inputTareaTitulo = document.getElementById('tareaTitulo');
-const inputTareaDescripcion = document.getElementById('tareaDescripcion');
-const selectTareaCategoria = document.getElementById('tareaCategoria');
+// ELEMENTOS DEL DOM (solo para eventos)
 const botonAgregar = document.getElementById('botonAgregar');
-const mensajeVacio = document.getElementById('mensajeVacio');
-const contadorTareas = document.getElementById('contadorTareas');
-const contenedorLista = document.getElementById('contenedorTareas');
 
 // ===================================================
-// ACTUALIZAR CONTADOR DE TAREAS
+// FUNCIONES DEL CONTROLADOR
 // ===================================================
 
-// Actualiza el contador de tareas
-function actualizarContadorTareas() {
-    let completadas = 0;
-    let pendientes = 0;
+// Actualizar toda la vista
+function actualizarVista() {
+    const estadisticas = obtenerEstadisticas();
+    const listaVacia = estaVacia();
     
-    lista.forEach(tarea => {
-        if (tarea.completada) {
-            completadas++;
+    // Renderizar lista con callback para eventos
+    uiFunciones.renderizarLista(lista, configurarEventos);
+    
+    // Actualizar contador
+    uiFunciones.actualizarContadorTareas(estadisticas);
+    
+    // Actualizar mensaje vacío
+    uiFunciones.actualizarMensajeVacio(listaVacia);
+}
+
+// ===================================================
+// MANEJADORES DE EVENTOS (Event Handlers)
+// ===================================================
+
+// Agregar nueva tarea
+function crearNuevaTarea() {
+    // Obtener datos del formulario (a través de la vista)
+    const datosFormulario = uiFunciones.obtenerDatosFormulario();
+    
+    // Procesar a través del modelo
+    const resultado = agregarTarea(
+        datosFormulario.titulo,
+        datosFormulario.descripcion,
+        datosFormulario.categoria
+    );
+    
+    if (resultado.exito) {
+        // Limpiar formulario
+        uiFunciones.limpiarFormulario();
+        
+        // Actualizar vista
+        actualizarVista();
+        
+        // Animar la nueva tarea añadida
+        setTimeout(() => {
+            const nuevaTarea = document.getElementById(`tarea-${resultado.indice}`);
+            uiFunciones.animarAparicionTarea(nuevaTarea);
+        }, 100);
+    } else {
+        // Mostrar error
+        uiFunciones.mostrarError(resultado.mensaje);
+    }
+}
+
+// Eliminar tarea
+function borrarTarea(index) {
+    const tareaElement = document.getElementById(`tarea-${index}`);
+    
+    // Animar eliminación y luego proceder
+    uiFunciones.animarEliminacionTarea(tareaElement, () => {
+        // Eliminar a través del modelo
+        const resultado = eliminarTarea(index);
+        
+        if (resultado.exito) {
+            // Actualizar vista
+            actualizarVista();
+            console.log(`Tarea en el índice ${index} eliminada.`);
         } else {
-            pendientes++;
+            uiFunciones.mostrarError(resultado.mensaje);
+            // Restaurar vista en caso de error
+            actualizarVista();
         }
     });
-    
-    contadorTareas.textContent = `Pendientes: ${pendientes} | Completadas: ${completadas}`;
 }
 
-// ===================================================
-// Actualizar mensaje vacío y contenedor
-// ===================================================
-
-function actualizarMensajeVacio() {
-    if (lista.length === 0) {   
-        uiFunciones.mostrarMensajeVacio();
-        contenedorLista.classList.add('d-none');
+// Alternar el estado de completada de una tarea
+function marcarCompletada(index) {
+    const resultado = toggleCompletarTarea(index);
+    
+    if (resultado.exito) {
+        // Actualizar vista
+        actualizarVista();
     } else {
-        uiFunciones.ocultarMensajeVacio();
-        contenedorLista.classList.remove('d-none');
+        uiFunciones.mostrarError(resultado.mensaje);
     }
 }
 
-// Llamar a la función al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    // Cargar tareas desde localStorage
-    cargarStorage();
-    
-    // Renderizar la lista con las tareas cargadas
-    renderizarLista();
-    
-    // Actualizar el mensaje vacío al cargar
-    actualizarMensajeVacio();
-    
-    // Actualizar el contador de tareas al cargar
-    actualizarContadorTareas();
-});
-
-// ===================================================
-// CREAR Y AGREGAR TAREAS
-// ===================================================
-
-// Validar los datos antes de crear una tarea
-function validarDatos(titulo, categoria) {
-    if (!titulo || !categoria) {
-        alert('Por favor, ingresa al menos el título y selecciona una categoría');
-        return false;
-    }
-    return true;
-}
-
-// Crear un objeto tarea nuevo
-function crearTarea(titulo, descripcion, categoria) {
-    return {
-        titulo: titulo,
-        categoria: categoria,
-        descripcion: descripcion,
-        completada: false
-    };
-}
-
-// Agregar la tarea al array
-function agregarTareaAlArray(tarea) {
-    lista.push(tarea);
-    guardarStorage(); // Guardar en localStorage
-    console.log('Tarea agregada:', tarea);
-    console.log('Lista completa:', lista);
-}
-
-// Limpiar el formulario después de agregar
-function limpiarFormulario() {
-    inputTareaTitulo.value = '';
-    inputTareaDescripcion.value = '';
-    selectTareaCategoria.value = '';
-}
-
-// Función principal para agregar una tarea completa
-function agregarTarea() {
-    // Obtener valores del formulario
-    const titulo = inputTareaTitulo.value.trim();
-    const descripcion = inputTareaDescripcion.value.trim();
-    const categoria = selectTareaCategoria.value;
-    
-    // Validar datos
-    if (!validarDatos(titulo, categoria)) {
+// Editar tarea
+function modificarTarea(index) {
+    if (index < 0 || index >= lista.length) {
+        uiFunciones.mostrarError('Tarea no encontrada');
         return;
     }
     
-    // Crear objeto tarea
-    const nuevaTarea = crearTarea(titulo, descripcion, categoria);
+    const tarea = lista[index];
     
-    // Agregar al array
-    agregarTareaAlArray(nuevaTarea);
+    // Mostrar formulario de edición (a través de la vista)
+    uiFunciones.mostrarFormularioEdicion(index, tarea, guardarTareaEditada);
     
-    // Actualizar la vista
-    renderizarLista();
-    
-    // Limpiar formulario
-    limpiarFormulario();
-
-    // Actualizar mensaje vacío
-    actualizarMensajeVacio();
-    
-    // Actualizar contador de tareas
-    actualizarContadorTareas();
-    
-    // Animar la nueva tarea añadida
-    setTimeout(() => {
-        const nuevaTarea = document.getElementById(`tarea-${lista.length - 1}`);
-        uiFunciones.animarAparicionTarea(nuevaTarea);
-    }, 100);
+    console.log(`Editando tarea en el índice ${index}`);
 }
 
-// ===================================================
-// RENDERIZAR Y MOSTRAR TAREAS
-// ===================================================
-
-// Obtener el color de la categoría
-function obtenerColorCategoria(categoria) {
-    switch(categoria) {
-        case 'Importante':
-            return 'bg-danger';      // Rojo
-        case 'Trabajo':
-            return 'bg-primary';        // Azul 
-        case 'Salud':
-            return 'bg-success';     // Verde claro
-        case 'Hogar':
-            return 'bg-purple';      // Morado
-        default:
-            return 'bg-secondary';   // Gris
+// Guardar los cambios de la tarea editada
+function guardarTareaEditada(index) {
+    // Obtener datos del formulario de edición
+    const datosEdicion = uiFunciones.obtenerDatosFormularioEdicion(index);
+    
+    // Actualizar a través del modelo
+    const resultado = actualizarTarea(
+        index,
+        datosEdicion.titulo,
+        datosEdicion.categoria,
+        datosEdicion.descripcion
+    );
+    
+    if (resultado.exito) {
+        // Actualizar vista
+        actualizarVista();
+        console.log('Tarea actualizada exitosamente');
+    } else {
+        uiFunciones.mostrarError(resultado.mensaje);
     }
 }
 
-// Renderizar todas las tareas en la pantalla
-function renderizarLista() {
-    let listaHTML = '';
-
-    // Crear HTML para cada tarea
-    lista.forEach((tarea, index) => {
-        const colorCategoria = obtenerColorCategoria(tarea.categoria);
-        listaHTML += `
-            <li id="tarea-${index}" draggable="true" class="list-group-item d-flex flex-column align-items-start position-relative ${tarea.completada ? 'completado' : ''}">
-                <div>
-                    <span class="fw-bold me-2 js-tituloTarea" data-index="${index}" style="cursor: pointer;">${tarea.titulo}</span>
-                    <span class="badge ms-2 ${colorCategoria} text-white">${tarea.categoria}</span>
-                </div>
-                <div class="small text-muted mt-1">${tarea.descripcion}</div>
-
-                <div class="dropdown position-absolute" style="top: -14px; right: 5px;">
-                    <button class="btn p-0 border-0 bg-transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.2rem; line-height: 1;">
-                        ...
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <button class="dropdown-item text-primary js-editarTarea" data-index="${index}">
-                                Editar
-                            </button>
-                        </li>
-                        <li>
-                            <button class="dropdown-item text-danger js-eliminarTarea" data-index="${index}">
-                                Eliminar
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </li>   
-        `;
-    });
+// Reordenar las tareas en el array
+function cambiarOrdenTareas(tareaOrigen, tareaDestino) {
+    // Obtener índices de las tareas
+    const indiceOrigen = parseInt(tareaOrigen.id.split('-')[1]);
+    const indiceDestino = parseInt(tareaDestino.id.split('-')[1]);
     
-    // Mostrar el HTML en la página
-    document.getElementById('listaTareas').innerHTML = listaHTML;
+    // Reordenar a través del modelo
+    const resultado = reordenarTareas(indiceOrigen, indiceDestino);
     
-    // Configurar eventos de los botones eliminar
-    configurarEventos();
-    
-    // Animar lista completa si hay tareas
-    if (lista.length > 0) {
-        setTimeout(() => {
-            uiFunciones.animarListaCompleta();
-        }, 50);
+    if (resultado.exito) {
+        // Actualizar vista
+        actualizarVista();
+    } else {
+        uiFunciones.mostrarError(resultado.mensaje);
     }
 }
 
-
-
 // ===================================================
-// CONFIGURAR EVENTOS DE LOS BOTONES ELIMINAR Y EDITAR
+// CONFIGURACIÓN DE EVENTOS DEL DOM
 // ===================================================
+
+// Configurar eventos de los botones y elementos de la lista
 function configurarEventos() {
     // Eventos para eliminar
     document.querySelectorAll('.js-eliminarTarea').forEach(boton => {
         boton.addEventListener('click', function() {
             const index = parseInt(this.getAttribute('data-index'));
-            eliminarTarea(index);
+            borrarTarea(index);
         });
     });
     
@@ -226,7 +181,7 @@ function configurarEventos() {
     document.querySelectorAll('.js-editarTarea').forEach(boton => {
         boton.addEventListener('click', function() {
             const index = parseInt(this.getAttribute('data-index'));
-            editarTarea(index);
+            modificarTarea(index);
         });
     });
     
@@ -235,32 +190,12 @@ function configurarEventos() {
         titulo.addEventListener('click', function(e) {
             e.stopPropagation(); // Prevenir propagación
             const index = parseInt(this.getAttribute('data-index'));
-            toggleCompletarTarea(index);
+            marcarCompletada(index);
         });
     });
     
     // Configurar eventos de drag and drop
     configurarDragAndDrop();
-}
-
-// ===================================================
-// COMPLETAR TAREAS
-// ===================================================
-
-// Alternar el estado de completada de una tarea
-function toggleCompletarTarea(index) {
-    // Cambiar el estado en el array
-    lista[index].completada = !lista[index].completada;
-    
-    guardarStorage(); // Guardar en localStorage
-    
-    console.log(`Tarea ${index} ${lista[index].completada ? 'completada' : 'pendiente'}:`, lista[index]);
-    
-    // Actualizar la vista
-    renderizarLista();
-    
-    // Actualizar contador de tareas
-    actualizarContadorTareas();
 }
 
 // ===================================================
@@ -305,146 +240,30 @@ function configurarDragAndDrop() {
             this.style.borderTop = '';
             
             if (tareaArrastrada !== this) {
-                reordenarTareas(tareaArrastrada, this);
+                cambiarOrdenTareas(tareaArrastrada, this);
             }
         });
     });
 }
 
-// Reordenar las tareas en el array
-function reordenarTareas(tareaOrigen, tareaDestino) {
-    // Obtener índices de las tareas
-    const indiceOrigen = parseInt(tareaOrigen.id.split('-')[1]);
-    const indiceDestino = parseInt(tareaDestino.id.split('-')[1]);
-    
-    // Mover el elemento en el array
-    const tareaMovida = lista.splice(indiceOrigen, 1)[0];
-    lista.splice(indiceDestino, 0, tareaMovida);
-    
-    guardarStorage(); // Guardar en localStorage
-    
-    console.log('Tareas reordenadas:', lista);
-    
-    // Volver a renderizar la lista
-    renderizarLista();
-}
-
 // ===================================================
-// ELIMINAR TAREAS
+// INICIALIZACIÓN DEL CONTROLADOR
 // ===================================================
 
-// Eliminar una tarea del array
-function eliminarTareaDelArray(index) {
-    if (index >= 0 && index < lista.length) {
-        lista.splice(index, 1);
-        guardarStorage(); // Guardar en localStorage
-        console.log('Tarea eliminada. Lista actualizada:', lista);
-    }
-}
-
-// Función principal para eliminar una tarea completa
-function eliminarTarea(index) {
-    const tareaElement = document.getElementById(`tarea-${index}`);
+// Inicializar la aplicación al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar UI y obtener funciones
+    uiFunciones = inicializarUI();
     
-    // Animar eliminación y luego proceder
-    uiFunciones.animarEliminacionTarea(tareaElement, () => {
-        // Eliminar del array
-        eliminarTareaDelArray(index);
-        
-        // Actualizar la vista
-        renderizarLista();
-        // Actualizar mensaje vacío
-        actualizarMensajeVacio();
-        
-        // Actualizar contador de tareas
-        actualizarContadorTareas();
-        
-        console.log(`Tarea en el índice ${index} eliminada.`);
-    });
-}
-
-
-// ===================================================
-// EDITAR TAREAS
-// ===================================================
-function editarTarea(index) {
-    const tarea = lista[index];
+    // Cargar tareas desde localStorage
+    cargarStorage();
     
-    // Crear el HTML del formulario de edición
-    const formularioHTML = `
-        <li id="tarea-${index}" draggable="false" class="list-group-item d-flex flex-column align-items-start position-relative">
-            <input type="text" class="form-control mb-2" value="${tarea.titulo}" id="editTitulo-${index}">
-            <select class="form-select mb-2" id="editCategoria-${index}">
-                <option value="Hogar" ${tarea.categoria === 'Hogar' ? 'selected' : ''}>Hogar</option>
-                <option value="Salud" ${tarea.categoria === 'Salud' ? 'selected' : ''}>Salud</option>
-                <option value="Trabajo" ${tarea.categoria === 'Trabajo' ? 'selected' : ''}>Trabajo</option>
-                <option value="Importante" ${tarea.categoria === 'Importante' ? 'selected' : ''}>Importante</option>
-            </select>
-            <input type="text" class="form-control mb-2" value="${tarea.descripcion}" id="editDescripcion-${index}">
-            <button class="btn btn-success btn-sm js-guardarTarea" data-index="${index}">Guardar</button>
-        </li>
-    `;
+    // Actualizar vista inicial
+    actualizarVista();
     
-    // Encontrar el li específico por su ID y reemplazarlo
-    const tareaElement = document.getElementById(`tarea-${index}`);
-    tareaElement.outerHTML = formularioHTML;
-    
-    // Configurar evento para el botón guardar
-    configurarEventoGuardar();
-    
-    // Configurar eventos de Enter para los inputs de edición
-    uiFunciones.configurarEventosEnterEdicion();
-    
-    console.log(`Editando tarea en el índice ${index}`);
-}
-
-// Configurar evento para el botón guardar
-function configurarEventoGuardar() {
-    document.querySelectorAll('.js-guardarTarea').forEach(boton => {
-        boton.addEventListener('click', function() {
-            const index = parseInt(this.getAttribute('data-index'));
-            guardarTareaEditada(index);
-        });
-    });
-}
-
-// Guardar los cambios de la tarea editada
-function guardarTareaEditada(index) {
-    // Obtener los nuevos valores del formulario
-    const nuevoTitulo = document.getElementById(`editTitulo-${index}`).value.trim();
-    const nuevaCategoria = document.getElementById(`editCategoria-${index}`).value;
-    const nuevaDescripcion = document.getElementById(`editDescripcion-${index}`).value.trim();
-    
-    // Validar que al menos el título esté completo
-    if (!nuevoTitulo) {
-        alert('El título no puede estar vacío');
-        return;
-    }
-    
-    // Actualizar el objeto en el array
-    lista[index].titulo = nuevoTitulo;
-    lista[index].categoria = nuevaCategoria;
-    lista[index].descripcion = nuevaDescripcion;
-    
-    guardarStorage(); // Guardar en localStorage
-    
-    console.log('Tarea actualizada:', lista[index]);
-    console.log('Lista completa:', lista);
-    
-    // Volver a renderizar la lista completa
-    renderizarLista();
-    
-    // Actualizar contador de tareas
-    actualizarContadorTareas();
-}
-
-// ===================================================
-// INICIALIZACIÓN
-// ===================================================
+    console.log('Controlador inicializado correctamente');
+});
 
 // Configurar el evento del botón agregar
-botonAgregar.addEventListener('click', agregarTarea);
-
-// Inicializar UI (filtros, tema, etc.) y obtener funciones de animación
-uiFunciones = inicializarUI();
+botonAgregar.addEventListener('click', crearNuevaTarea);
 
