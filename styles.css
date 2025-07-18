@@ -89,6 +89,47 @@ body.bg-dark .list-group-item .small {
 }
 
 /* ===========================
+   DROPDOWNS EN LISTA DE TAREAS
+=========================== */
+/* Botón de tres puntos en modo oscuro */
+.theme-dark .list-group-item .btn,
+body.bg-dark .list-group-item .btn {
+  color: #f8f9fa !important;
+}
+
+/* Menú dropdown en modo oscuro */
+.theme-dark .dropdown-menu,
+body.bg-dark .dropdown-menu {
+  background-color: #23272b !important;
+  border-color: #343a40 !important;
+}
+
+/* Items del dropdown en modo oscuro */
+.theme-dark .dropdown-item,
+body.bg-dark .dropdown-item {
+  color: #f8f9fa !important;
+}
+
+.theme-dark .dropdown-item:hover,
+.theme-dark .dropdown-item:focus,
+body.bg-dark .dropdown-item:hover,
+body.bg-dark .dropdown-item:focus {
+  background-color: #343a40 !important;
+  color: #fff !important;
+}
+
+/* Color específico para botones de acción */
+.theme-dark .dropdown-item.text-primary,
+body.bg-dark .dropdown-item.text-primary {
+  color: #4dabf7 !important;
+}
+
+.theme-dark .dropdown-item.text-danger,
+body.bg-dark .dropdown-item.text-danger {
+  color: #ff6b6b !important;
+}
+
+/* ===========================
    FORMULARIOS E INPUTS
 =========================== */
 .theme-dark .form-control,

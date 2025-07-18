@@ -1,587 +1,450 @@
-// =======================
-// Variables globales
-// =======================
-const tareaInput = document.getElementById('tareaInput');
+// IMPORTACIONES
+import { lista, guardarStorage, cargarStorage } from "./lista.js";
+import { inicializarUI } from "./ui.js";
+
+// Variables para las funciones de UI
+let uiFunciones;
+
+// ELEMENTOS DEL DOM
+const inputTareaTitulo = document.getElementById('tareaTitulo');
+const inputTareaDescripcion = document.getElementById('tareaDescripcion');
+const selectTareaCategoria = document.getElementById('tareaCategoria');
 const botonAgregar = document.getElementById('botonAgregar');
-const listaTareas = document.getElementById('listaTareas');
 const mensajeVacio = document.getElementById('mensajeVacio');
-const botonFiltrar = document.getElementById('botonFiltrar');
-const filtrosOpciones = document.getElementById('filtrosOpciones');
-const filtroTodas = document.getElementById('filtroTodas');
-const filtroCompletadas = document.getElementById('filtroCompletadas');
-const filtroPendientes = document.getElementById('filtroPendientes');
-const tareaTitulo = document.getElementById('tareaTitulo');
-const tareaCategoria = document.getElementById('tareaCategoria');
 const contadorTareas = document.getElementById('contadorTareas');
+const contenedorLista = document.getElementById('contenedorTareas');
 
-
-// Restaurar tema guardado
-const temaGuardado = localStorage.getItem('tema');
-if (temaGuardado === 'oscuro') {
-  document.body.classList.remove('bg-white', 'text-dark');
-  document.body.classList.add('bg-dark', 'text-light');
-} else {
-  document.body.classList.remove('bg-dark', 'text-light');
-  document.body.classList.add('bg-white', 'text-dark');
-};
-
-// =======================
-// Funciones principales
-// =======================
-
-// Muestra u oculta el mensaje de lista vacía
-function actualizarMensajeVacio() {
-  const contenedorTareas = document.getElementById('contenedorTareas');
-  const vacio = listaTareas.children.length === 0;
-  mensajeVacio.classList.toggle('mostrar', vacio);
-  if (contenedorTareas) contenedorTareas.style.display = vacio ? 'none' : '';
-};
-
-// Guarda tareas en localStorage y actualiza contador
-function guardarTareas() {
-  const tareasArray = [];
-  listaTareas.querySelectorAll('li').forEach(li => {
-    const divSuperior = li.querySelector('div');
-    const spanTitulo = divSuperior ? divSuperior.querySelector('span.fw-bold') : null;
-    const spanCategoria = divSuperior ? divSuperior.querySelector('span.badge') : null;
-    const divDescripcion = li.querySelector('div.small');
-    tareasArray.push({
-      titulo: spanTitulo ? spanTitulo.textContent : '',
-      categoria: spanCategoria ? spanCategoria.textContent : '',
-      descripcion: divDescripcion ? divDescripcion.textContent : '',
-      completado: li.classList.contains('completado')
-    });
-  });
-  localStorage.setItem('tareas', JSON.stringify(tareasArray));
-  actualizarMensajeVacio();
-  actualizarContadorTareas();
-};
-
-// Carga tareas guardadas desde localStorage
-function cargarTareas() {
-  listaTareas.innerHTML = ""; // Limpia la lista antes de cargar
-  const tareasGuardadas = JSON.parse(localStorage.getItem('tareas'));
-  if (!tareasGuardadas) return actualizarMensajeVacio();
-
-  tareasGuardadas.forEach((tareaObj) => {
-    const li = document.createElement("li");
-    li.setAttribute('draggable', true);
-
-    // Drag & drop
-    li.addEventListener('dragstart', (e) => {
-      li.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    li.addEventListener('dragend', () => {
-      li.classList.remove('dragging');
-    });
-
-  // Doble click para editar
-  li.addEventListener('dblclick', () => {
-    li.setAttribute('draggable', false);
-    // Obtener los valores actuales
-    const divSuperior = li.querySelector('div');
-    const spanTitulo = divSuperior.querySelector('span.fw-bold');
-    const spanCategoria = divSuperior.querySelector('span.badge');
-    const divDescripcion = li.querySelector('div.small');
-
-    // Crear inputs para edición
-    const inputTitulo = document.createElement('input');
-    inputTitulo.type = 'text';
-    inputTitulo.value = spanTitulo.textContent;
-    inputTitulo.className = 'form-control mb-2';
-
-    const selectCategoria = document.createElement('select');
-    selectCategoria.className = 'form-select mb-2';
-    ['Hogar', 'Salud', 'Trabajo', 'Importante'].forEach(cat => {
-      const option = document.createElement('option');
-      option.value = cat;
-      option.textContent = cat;
-      if (spanCategoria.textContent === cat) option.selected = true;
-      selectCategoria.appendChild(option);
-    });
-
-    const inputDescripcion = document.createElement('input');
-    inputDescripcion.type = 'text';
-    inputDescripcion.value = divDescripcion ? divDescripcion.textContent : '';
-    inputDescripcion.className = 'form-control mb-2';
-
-    // Botón guardar
-    const btnGuardar = document.createElement('button');
-    btnGuardar.textContent = 'Guardar';
-    btnGuardar.className = 'btn btn-success btn-sm';
-
-    // Limpiar el li y agregar los inputs
-    li.innerHTML = '';
-    li.appendChild(inputTitulo);
-    li.appendChild(selectCategoria);
-    li.appendChild(inputDescripcion);
-    li.appendChild(btnGuardar);
-
-    // Keydown para guardar al presionar Enter
-    [inputTitulo, inputDescripcion].forEach(input => {
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          btnGuardar.click();
-        }
-      });
-    });
-
-    btnGuardar.addEventListener('click', () => {
-      li.setAttribute('draggable', true); // Reactiva drag and drop
-      guardarTareas();
-      // Validar
-      if (inputTitulo.value.trim() === '' || selectCategoria.value === '') {
-        alert('Título y categoría son obligatorios');
-        return;
-      }
-      // Actualizar valores
-      spanTitulo.textContent = inputTitulo.value.trim();
-      spanCategoria.textContent = selectCategoria.value;
-      spanCategoria.className = `badge ms-2 ${obtenerClaseCategoria(selectCategoria.value)}`;
-      if (inputDescripcion.value.trim() !== '') {
-        if (!divDescripcion) {
-          const nuevaDescripcion = document.createElement('div');
-          nuevaDescripcion.className = 'small text-muted mt-1';
-          nuevaDescripcion.textContent = inputDescripcion.value.trim();
-          li.appendChild(nuevaDescripcion);
-        } else {
-          divDescripcion.textContent = inputDescripcion.value.trim();
-        }
-      } else if (divDescripcion) {
-        divDescripcion.remove();
-      }
-
-      // Restaurar estructura original
-      const divSuperiorNuevo = document.createElement('div');
-      divSuperiorNuevo.appendChild(spanTitulo);
-      divSuperiorNuevo.appendChild(spanCategoria);
-      li.innerHTML = '';
-      li.appendChild(divSuperiorNuevo);
-      if (inputDescripcion.value.trim() !== '') {
-        const nuevaDescripcion = document.createElement('div');
-        nuevaDescripcion.className = 'small text-muted mt-1';
-        nuevaDescripcion.textContent = inputDescripcion.value.trim();
-        li.appendChild(nuevaDescripcion);
-      }
-      li.classList.add("list-group-item", "d-flex", "flex-column", "align-items-start");
-
-      const btnEliminar = document.createElement("button");
-      btnEliminar.textContent = "Eliminar";
-      btnEliminar.className = "btn btn-sm position-absolute top-0 end-0  text-danger";
-      btnEliminar.style.zIndex = "2";
-      btnEliminar.addEventListener('click', (e) => {
-        e.stopPropagation();
-        li.classList.add('eliminando');
-        setTimeout(() => {
-          li.remove();
-          guardarTareas();
-        }, 300);
-      });
-      li.appendChild(btnEliminar);
-
-      guardarTareas();
-    });
-  });
-
-    // Título
-    const spanTitulo = document.createElement("span");
-    spanTitulo.textContent = tareaObj.titulo || '';
-    spanTitulo.classList.add("fw-bold", "me-2");
-
-    // Categoría
-    const spanCategoria = document.createElement("span");
-    spanCategoria.textContent = tareaObj.categoria || '';
-    spanCategoria.className = `badge ms-2 ${obtenerClaseCategoria(tareaObj.categoria)}`;
-
-    // Línea superior: título + categoría
-    const divSuperior = document.createElement("div");
-    divSuperior.appendChild(spanTitulo);
-    divSuperior.appendChild(spanCategoria);
-
-    // Descripción (opcional)
-    let divDescripcion = null;
-    if (tareaObj.descripcion) {
-      divDescripcion = document.createElement("div");
-      divDescripcion.textContent = tareaObj.descripcion;
-      divDescripcion.classList.add("small", "text-muted", "mt-1");
-    }
-
-    li.appendChild(divSuperior);
-    if (divDescripcion) li.appendChild(divDescripcion);
-
-    li.classList.add("list-group-item", "d-flex", "flex-column", "align-items-start");
-    if (tareaObj.completado) li.classList.add("completado");
-
-    // Botón eliminar
-    const btnEliminar = document.createElement("button");
-    btnEliminar.textContent = "Eliminar"; // equis
-    btnEliminar.className = "btn btn-sm position-absolute top-0 end-0 text-danger";
-    btnEliminar.style.zIndex = "2";
-    btnEliminar.addEventListener('click', (e) => {
-      e.stopPropagation();
-      li.classList.add('eliminando');
-      setTimeout(() => {
-        li.remove();
-        guardarTareas();
-      }, 300);
-    });
-
-    // Evento: marcar como completada
-    li.addEventListener('click', (e) => {
-      e.stopPropagation();
-      li.classList.toggle('completado');
-      guardarTareas();
-    });
-
-    li.classList.add("position-relative");
-    li.appendChild(btnEliminar);
-    listaTareas.appendChild(li);
-  });
-
-  actualizarMensajeVacio();
-  actualizarContadorTareas();
-};
+// ===================================================
+// ACTUALIZAR CONTADOR DE TAREAS
+// ===================================================
 
 // Actualiza el contador de tareas
 function actualizarContadorTareas() {
-  const items = listaTareas.querySelectorAll('li');
-  let completadas = 0;
-  let pendientes = 0;
-  items.forEach(li => {
-    if (li.classList.contains('completado')) {
-      completadas++;
-    } else {
-      pendientes++;
-    }
-  });
-  contadorTareas.textContent = `Pendientes: ${pendientes} | Completadas: ${completadas}`;
-};
-
-// Función auxiliar
-function getDragAfterElement(container, y) {
-  const draggableElements = [...container.querySelectorAll('li:not(.dragging)')];
-  return draggableElements.reduce((closest, child) => {
-    const box = child.getBoundingClientRect();
-    const offset = y - box.top - box.height / 2;
-    if (offset < 0 && offset > closest.offset) {
-      return { offset: offset, element: child };
-    } else {
-      return closest;
-    }
-  }, { offset: -Infinity }).element;
-};
-
-// Colores de categorías
-// Esta función devuelve la clase CSS correspondiente a cada categoría
-function obtenerClaseCategoria(categoria) {
-  switch (categoria) {
-    case 'Hogar':
-      return 'bg-purple text-white';      // Morado
-    case 'Salud':
-      return 'bg-success text-white';     // Verde
-    case 'Trabajo':
-      return 'bg-info text-dark';         // Turquesa
-    case 'Importante':
-      return 'bg-danger text-white';      // Rojo
-    default:
-      return 'bg-secondary text-white';
-  }
-};
-
-
-
-
-
-
-
-
-
-
-
-// =======================
-// Eventos principales
-// =======================
-
-// Al cargar la página, cargar tareas
-window.addEventListener('load', cargarTareas);
-
-// Agregar tarea
-botonAgregar.addEventListener('click', () => {
-  const titulo = tareaTitulo.value.trim();
-  const categoria = tareaCategoria.value;
-  const descripcion = tareaInput.value.trim();
-
-  if (titulo !== "" && categoria !== "") {
-    const li = document.createElement("li");
-    li.setAttribute('draggable', true);
-
-    // Drag & drop
-    li.addEventListener('dragstart', (e) => {
-      li.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    li.addEventListener('dragend', () => {
-      li.classList.remove('dragging');
-    });
-  
-  // Evento para editar tarea al hacer doble clic
-  li.addEventListener('dblclick', () => {
-    li.setAttribute('draggable', false);
-    // Obtener los valores actuales
-    const divSuperior = li.querySelector('div');
-    const spanTitulo = divSuperior.querySelector('span.fw-bold');
-    const spanCategoria = divSuperior.querySelector('span.badge');
-    const divDescripcion = li.querySelector('div.small');
-
-    // Crear inputs para edición
-    const inputTitulo = document.createElement('input');
-    inputTitulo.type = 'text';
-    inputTitulo.value = spanTitulo.textContent;
-    inputTitulo.className = 'form-control mb-2';
-
-    const selectCategoria = document.createElement('select');
-    selectCategoria.className = 'form-select mb-2';
-    ['Hogar', 'Salud', 'Trabajo', 'Importante'].forEach(cat => {
-      const option = document.createElement('option');
-      option.value = cat;
-      option.textContent = cat;
-      if (spanCategoria.textContent === cat) option.selected = true;
-      selectCategoria.appendChild(option);
-    });
-
-    const inputDescripcion = document.createElement('input');
-    inputDescripcion.type = 'text';
-    inputDescripcion.value = divDescripcion ? divDescripcion.textContent : '';
-    inputDescripcion.className = 'form-control mb-2';
-
-    // Botón guardar
-    const btnGuardar = document.createElement('button');
-    btnGuardar.textContent = 'Guardar';
-    btnGuardar.className = 'btn btn-success btn-sm';
-
-    // Limpiar el li y agregar los inputs
-    li.innerHTML = '';
-    li.appendChild(inputTitulo);
-    li.appendChild(selectCategoria);
-    li.appendChild(inputDescripcion);
-    li.appendChild(btnGuardar);
-
-    // Keydown para guardar al presionar Enter
-    [inputTitulo, inputDescripcion].forEach(input => {
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          btnGuardar.click();
-        }
-      });
-    });
-
-    // Evento para guardar cambios
-    btnGuardar.addEventListener('click', () => {
-      li.setAttribute('draggable', true); // Reactiva drag and drop
-      guardarTareas();
-      // Validar
-      if (inputTitulo.value.trim() === '' || selectCategoria.value === '') {
-        alert('Título y categoría son obligatorios');
-        return;
-      }
-      // Actualizar valores
-      spanTitulo.textContent = inputTitulo.value.trim();
-      spanCategoria.textContent = selectCategoria.value;
-      spanCategoria.className = `badge ms-2 ${obtenerClaseCategoria(selectCategoria.value)}`;
-      if (inputDescripcion.value.trim() !== '') {
-        if (!divDescripcion) {
-          const nuevaDescripcion = document.createElement('div');
-          nuevaDescripcion.className = 'small text-muted mt-1';
-          nuevaDescripcion.textContent = inputDescripcion.value.trim();
-          li.appendChild(nuevaDescripcion);
+    let completadas = 0;
+    let pendientes = 0;
+    
+    lista.forEach(tarea => {
+        if (tarea.completada) {
+            completadas++;
         } else {
-          divDescripcion.textContent = inputDescripcion.value.trim();
+            pendientes++;
         }
-      } else if (divDescripcion) {
-        divDescripcion.remove();
-      }
+    });
+    
+    contadorTareas.textContent = `Pendientes: ${pendientes} | Completadas: ${completadas}`;
+}
 
-      // Restaurar estructura original
-      const divSuperiorNuevo = document.createElement('div');
-      divSuperiorNuevo.appendChild(spanTitulo);
-      divSuperiorNuevo.appendChild(spanCategoria);
-      li.innerHTML = '';
-      li.appendChild(divSuperiorNuevo);
-      if (inputDescripcion.value.trim() !== '') {
-        const nuevaDescripcion = document.createElement('div');
-        nuevaDescripcion.className = 'small text-muted mt-1';
-        nuevaDescripcion.textContent = inputDescripcion.value.trim();
-        li.appendChild(nuevaDescripcion);
-      }
-      li.classList.add("list-group-item", "d-flex", "flex-column", "align-items-start");
+// ===================================================
+// Actualizar mensaje vacío y contenedor
+// ===================================================
 
-      const btnEliminar = document.createElement("button");
-      btnEliminar.textContent = "Eliminar";
-      btnEliminar.className = "btn btn-sm position-absolute top-0 end-0  text-danger";
-      btnEliminar.style.zIndex = "2";
-      btnEliminar.addEventListener('click', (e) => {
-        e.stopPropagation();
-        li.classList.add('eliminando');
+function actualizarMensajeVacio() {
+    if (lista.length === 0) {   
+        uiFunciones.mostrarMensajeVacio();
+        contenedorLista.classList.add('d-none');
+    } else {
+        uiFunciones.ocultarMensajeVacio();
+        contenedorLista.classList.remove('d-none');
+    }
+}
+
+// Llamar a la función al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    // Cargar tareas desde localStorage
+    cargarStorage();
+    
+    // Renderizar la lista con las tareas cargadas
+    renderizarLista();
+    
+    // Actualizar el mensaje vacío al cargar
+    actualizarMensajeVacio();
+    
+    // Actualizar el contador de tareas al cargar
+    actualizarContadorTareas();
+});
+
+// ===================================================
+// CREAR Y AGREGAR TAREAS
+// ===================================================
+
+// Validar los datos antes de crear una tarea
+function validarDatos(titulo, categoria) {
+    if (!titulo || !categoria) {
+        alert('Por favor, ingresa al menos el título y selecciona una categoría');
+        return false;
+    }
+    return true;
+}
+
+// Crear un objeto tarea nuevo
+function crearTarea(titulo, descripcion, categoria) {
+    return {
+        titulo: titulo,
+        categoria: categoria,
+        descripcion: descripcion,
+        completada: false
+    };
+}
+
+// Agregar la tarea al array
+function agregarTareaAlArray(tarea) {
+    lista.push(tarea);
+    guardarStorage(); // Guardar en localStorage
+    console.log('Tarea agregada:', tarea);
+    console.log('Lista completa:', lista);
+}
+
+// Limpiar el formulario después de agregar
+function limpiarFormulario() {
+    inputTareaTitulo.value = '';
+    inputTareaDescripcion.value = '';
+    selectTareaCategoria.value = '';
+}
+
+// Función principal para agregar una tarea completa
+function agregarTarea() {
+    // Obtener valores del formulario
+    const titulo = inputTareaTitulo.value.trim();
+    const descripcion = inputTareaDescripcion.value.trim();
+    const categoria = selectTareaCategoria.value;
+    
+    // Validar datos
+    if (!validarDatos(titulo, categoria)) {
+        return;
+    }
+    
+    // Crear objeto tarea
+    const nuevaTarea = crearTarea(titulo, descripcion, categoria);
+    
+    // Agregar al array
+    agregarTareaAlArray(nuevaTarea);
+    
+    // Actualizar la vista
+    renderizarLista();
+    
+    // Limpiar formulario
+    limpiarFormulario();
+
+    // Actualizar mensaje vacío
+    actualizarMensajeVacio();
+    
+    // Actualizar contador de tareas
+    actualizarContadorTareas();
+    
+    // Animar la nueva tarea añadida
+    setTimeout(() => {
+        const nuevaTarea = document.getElementById(`tarea-${lista.length - 1}`);
+        uiFunciones.animarAparicionTarea(nuevaTarea);
+    }, 100);
+}
+
+// ===================================================
+// RENDERIZAR Y MOSTRAR TAREAS
+// ===================================================
+
+// Obtener el color de la categoría
+function obtenerColorCategoria(categoria) {
+    switch(categoria) {
+        case 'Importante':
+            return 'bg-danger';      // Rojo
+        case 'Trabajo':
+            return 'bg-primary';        // Azul 
+        case 'Salud':
+            return 'bg-success';     // Verde claro
+        case 'Hogar':
+            return 'bg-purple';      // Morado
+        default:
+            return 'bg-secondary';   // Gris
+    }
+}
+
+// Renderizar todas las tareas en la pantalla
+function renderizarLista() {
+    let listaHTML = '';
+
+    // Crear HTML para cada tarea
+    lista.forEach((tarea, index) => {
+        const colorCategoria = obtenerColorCategoria(tarea.categoria);
+        listaHTML += `
+            <li id="tarea-${index}" draggable="true" class="list-group-item d-flex flex-column align-items-start position-relative ${tarea.completada ? 'completado' : ''}">
+                <div>
+                    <span class="fw-bold me-2 js-tituloTarea" data-index="${index}" style="cursor: pointer;">${tarea.titulo}</span>
+                    <span class="badge ms-2 ${colorCategoria} text-white">${tarea.categoria}</span>
+                </div>
+                <div class="small text-muted mt-1">${tarea.descripcion}</div>
+
+                <div class="dropdown position-absolute" style="top: -14px; right: 5px;">
+                    <button class="btn p-0 border-0 bg-transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.2rem; line-height: 1;">
+                        ...
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <button class="dropdown-item text-primary js-editarTarea" data-index="${index}">
+                                Editar
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item text-danger js-eliminarTarea" data-index="${index}">
+                                Eliminar
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </li>   
+        `;
+    });
+    
+    // Mostrar el HTML en la página
+    document.getElementById('listaTareas').innerHTML = listaHTML;
+    
+    // Configurar eventos de los botones eliminar
+    configurarEventos();
+    
+    // Animar lista completa si hay tareas
+    if (lista.length > 0) {
         setTimeout(() => {
-          li.remove();
-          guardarTareas();
-        }, 300);
-      });
-      li.appendChild(btnEliminar);
-
-      guardarTareas();
-    });
-  });
-
-    // Título
-    const spanTitulo = document.createElement("span");
-    spanTitulo.textContent = titulo;
-    spanTitulo.classList.add("fw-bold", "me-2");
-
-    // Categoría
-    const spanCategoria = document.createElement("span");
-    spanCategoria.textContent = categoria;
-    spanCategoria.className = `badge ms-2 ${obtenerClaseCategoria(categoria)}`;
-
-    // Línea superior: título + categoría
-    const divSuperior = document.createElement("div");
-    divSuperior.appendChild(spanTitulo);
-    divSuperior.appendChild(spanCategoria);
-
-    // Descripción (opcional)
-    let divDescripcion = null;
-    if (descripcion) {
-      divDescripcion = document.createElement("div");
-      divDescripcion.textContent = descripcion;
-      divDescripcion.classList.add("small", "text-muted", "mt-1");
+            uiFunciones.animarListaCompleta();
+        }, 50);
     }
+}
 
-    li.appendChild(divSuperior);
-    if (divDescripcion) li.appendChild(divDescripcion);
 
-    li.classList.add("list-group-item", "d-flex", "flex-column", "align-items-start");
 
-    // Botón eliminar
-    const btnEliminar = document.createElement("button");
-    btnEliminar.textContent = "Eliminar"; // equis
-    btnEliminar.className = "btn btn-sm position-absolute top-0 end-0  text-danger";
-    btnEliminar.style.zIndex = "2";
-    btnEliminar.addEventListener('click', (e) => {
-      e.stopPropagation();
-      li.classList.add('eliminando');
-      setTimeout(() => {
-        li.remove();
-        guardarTareas();
-      }, 300);
+// ===================================================
+// CONFIGURAR EVENTOS DE LOS BOTONES ELIMINAR Y EDITAR
+// ===================================================
+function configurarEventos() {
+    // Eventos para eliminar
+    document.querySelectorAll('.js-eliminarTarea').forEach(boton => {
+        boton.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            eliminarTarea(index);
+        });
     });
-
-    // Evento: marcar como completada
-    li.addEventListener('click', (e) => {
-      e.stopPropagation();
-      li.classList.toggle('completado');
-      guardarTareas();
+    
+    // Eventos para editar
+    document.querySelectorAll('.js-editarTarea').forEach(boton => {
+        boton.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            editarTarea(index);
+        });
     });
+    
+    // Eventos para marcar como completada
+    document.querySelectorAll('.js-tituloTarea').forEach(titulo => {
+        titulo.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevenir propagación
+            const index = parseInt(this.getAttribute('data-index'));
+            toggleCompletarTarea(index);
+        });
+    });
+    
+    // Configurar eventos de drag and drop
+    configurarDragAndDrop();
+}
 
-    li.classList.add("position-relative");
-    li.appendChild(btnEliminar);
-    listaTareas.appendChild(li);
+// ===================================================
+// COMPLETAR TAREAS
+// ===================================================
 
-    // Limpiar inputs
-    tareaTitulo.value = "";
-    tareaCategoria.value = "";
-    tareaInput.value = "";
-    guardarTareas();
-  } else {
-    alert('Título y categoría son obligatorios');
-  }
-});
+// Alternar el estado de completada de una tarea
+function toggleCompletarTarea(index) {
+    // Cambiar el estado en el array
+    lista[index].completada = !lista[index].completada;
+    
+    guardarStorage(); // Guardar en localStorage
+    
+    console.log(`Tarea ${index} ${lista[index].completada ? 'completada' : 'pendiente'}:`, lista[index]);
+    
+    // Actualizar la vista
+    renderizarLista();
+    
+    // Actualizar contador de tareas
+    actualizarContadorTareas();
+}
 
-// Agregar tarea con Enter
-tareaInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    botonAgregar.click();
-  }
-});
+// ===================================================
+// DRAG AND DROP
+// ===================================================
 
-tareaTitulo.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    botonAgregar.click();
-  }
-});
+let tareaArrastrada = null;
 
+// Configurar eventos de drag and drop para todas las tareas
+function configurarDragAndDrop() {
+    const tareasElements = document.querySelectorAll('[id^="tarea-"]');
+    
+    tareasElements.forEach(tarea => {
+        // Cuando empieza el arrastre
+        tarea.addEventListener('dragstart', function(e) {
+            tareaArrastrada = this;
+            this.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        
+        // Cuando termina el arrastre
+        tarea.addEventListener('dragend', function(e) {
+            this.style.opacity = '1';
+            tareaArrastrada = null;
+        });
+        
+        // Cuando se arrastra sobre otro elemento
+        tarea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.style.borderTop = '2px solid #007bff';
+        });
+        
+        // Cuando sale del área de otro elemento
+        tarea.addEventListener('dragleave', function(e) {
+            this.style.borderTop = '';
+        });
+        
+        // Cuando se suelta sobre otro elemento
+        tarea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderTop = '';
+            
+            if (tareaArrastrada !== this) {
+                reordenarTareas(tareaArrastrada, this);
+            }
+        });
+    });
+}
 
+// Reordenar las tareas en el array
+function reordenarTareas(tareaOrigen, tareaDestino) {
+    // Obtener índices de las tareas
+    const indiceOrigen = parseInt(tareaOrigen.id.split('-')[1]);
+    const indiceDestino = parseInt(tareaDestino.id.split('-')[1]);
+    
+    // Mover el elemento en el array
+    const tareaMovida = lista.splice(indiceOrigen, 1)[0];
+    lista.splice(indiceDestino, 0, tareaMovida);
+    
+    guardarStorage(); // Guardar en localStorage
+    
+    console.log('Tareas reordenadas:', lista);
+    
+    // Volver a renderizar la lista
+    renderizarLista();
+}
 
-// Mostrar menú de filtros
-botonFiltrar.addEventListener('click', (e) => {
-  e.stopPropagation();
-  filtrosOpciones.classList.toggle('d-none');
-});
+// ===================================================
+// ELIMINAR TAREAS
+// ===================================================
 
-// Ocultar menú de filtros al hacer click fuera
-document.addEventListener('click', (e) => {
-  if (!botonFiltrar.contains(e.target) && !filtrosOpciones.contains(e.target)) {
-    filtrosOpciones.classList.add('d-none');
-  }
-});
-
-// Filtros
-filtroTodas.addEventListener('click', () => {
-  const items = listaTareas.querySelectorAll('li');
-  items.forEach(li => li.classList.remove('d-none'));
-});
-
-filtroCompletadas.addEventListener('click', () => {
-  const items = listaTareas.querySelectorAll('li');
-  items.forEach(li => {
-    if (li.classList.contains('completado')) {
-      li.classList.remove('d-none');
-    } else {
-      li.classList.add('d-none');
+// Eliminar una tarea del array
+function eliminarTareaDelArray(index) {
+    if (index >= 0 && index < lista.length) {
+        lista.splice(index, 1);
+        guardarStorage(); // Guardar en localStorage
+        console.log('Tarea eliminada. Lista actualizada:', lista);
     }
-  });
-});
+}
 
-filtroPendientes.addEventListener('click', () => {
-  const items = listaTareas.querySelectorAll('li');
-  items.forEach(li => {
-    if (li.classList.contains('completado')) {
-      li.classList.add('d-none');
-    } else {
-      li.classList.remove('d-none');
+// Función principal para eliminar una tarea completa
+function eliminarTarea(index) {
+    const tareaElement = document.getElementById(`tarea-${index}`);
+    
+    // Animar eliminación y luego proceder
+    uiFunciones.animarEliminacionTarea(tareaElement, () => {
+        // Eliminar del array
+        eliminarTareaDelArray(index);
+        
+        // Actualizar la vista
+        renderizarLista();
+        // Actualizar mensaje vacío
+        actualizarMensajeVacio();
+        
+        // Actualizar contador de tareas
+        actualizarContadorTareas();
+        
+        console.log(`Tarea en el índice ${index} eliminada.`);
+    });
+}
+
+
+// ===================================================
+// EDITAR TAREAS
+// ===================================================
+function editarTarea(index) {
+    const tarea = lista[index];
+    
+    // Crear el HTML del formulario de edición
+    const formularioHTML = `
+        <li id="tarea-${index}" draggable="false" class="list-group-item d-flex flex-column align-items-start position-relative">
+            <input type="text" class="form-control mb-2" value="${tarea.titulo}" id="editTitulo-${index}">
+            <select class="form-select mb-2" id="editCategoria-${index}">
+                <option value="Hogar" ${tarea.categoria === 'Hogar' ? 'selected' : ''}>Hogar</option>
+                <option value="Salud" ${tarea.categoria === 'Salud' ? 'selected' : ''}>Salud</option>
+                <option value="Trabajo" ${tarea.categoria === 'Trabajo' ? 'selected' : ''}>Trabajo</option>
+                <option value="Importante" ${tarea.categoria === 'Importante' ? 'selected' : ''}>Importante</option>
+            </select>
+            <input type="text" class="form-control mb-2" value="${tarea.descripcion}" id="editDescripcion-${index}">
+            <button class="btn btn-success btn-sm js-guardarTarea" data-index="${index}">Guardar</button>
+        </li>
+    `;
+    
+    // Encontrar el li específico por su ID y reemplazarlo
+    const tareaElement = document.getElementById(`tarea-${index}`);
+    tareaElement.outerHTML = formularioHTML;
+    
+    // Configurar evento para el botón guardar
+    configurarEventoGuardar();
+    
+    // Configurar eventos de Enter para los inputs de edición
+    uiFunciones.configurarEventosEnterEdicion();
+    
+    console.log(`Editando tarea en el índice ${index}`);
+}
+
+// Configurar evento para el botón guardar
+function configurarEventoGuardar() {
+    document.querySelectorAll('.js-guardarTarea').forEach(boton => {
+        boton.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            guardarTareaEditada(index);
+        });
+    });
+}
+
+// Guardar los cambios de la tarea editada
+function guardarTareaEditada(index) {
+    // Obtener los nuevos valores del formulario
+    const nuevoTitulo = document.getElementById(`editTitulo-${index}`).value.trim();
+    const nuevaCategoria = document.getElementById(`editCategoria-${index}`).value;
+    const nuevaDescripcion = document.getElementById(`editDescripcion-${index}`).value.trim();
+    
+    // Validar que al menos el título esté completo
+    if (!nuevoTitulo) {
+        alert('El título no puede estar vacío');
+        return;
     }
-  });
-});
+    
+    // Actualizar el objeto en el array
+    lista[index].titulo = nuevoTitulo;
+    lista[index].categoria = nuevaCategoria;
+    lista[index].descripcion = nuevaDescripcion;
+    
+    guardarStorage(); // Guardar en localStorage
+    
+    console.log('Tarea actualizada:', lista[index]);
+    console.log('Lista completa:', lista);
+    
+    // Volver a renderizar la lista completa
+    renderizarLista();
+    
+    // Actualizar contador de tareas
+    actualizarContadorTareas();
+}
 
-// Permitir soltar sobre la lista
-listaTareas.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  const dragging = document.querySelector('.dragging');
-  const afterElement = getDragAfterElement(listaTareas, e.clientY);
-  if (afterElement == null) {
-    listaTareas.appendChild(dragging);
-  } else {
-    listaTareas.insertBefore(dragging, afterElement);
-  }
-});
+// ===================================================
+// INICIALIZACIÓN
+// ===================================================
 
-// Guardar el nuevo orden al soltar
-listaTareas.addEventListener('drop', () => {
-  guardarTareas();
-});
+// Configurar el evento del botón agregar
+botonAgregar.addEventListener('click', agregarTarea);
 
-// Cambiar tema claro
-document.getElementById('themeLight').addEventListener('click', function(e) {
-  e.preventDefault();
-  document.body.classList.remove('bg-dark', 'text-light');
-  document.body.classList.add('bg-white', 'text-dark');
-  localStorage.setItem('tema', 'claro');
-});
+// Inicializar UI (filtros, tema, etc.) y obtener funciones de animación
+uiFunciones = inicializarUI();
 
-// Cambiar tema oscuro
-document.getElementById('themeDark').addEventListener('click', function(e) {
-  e.preventDefault();
-  document.body.classList.remove('bg-white', 'text-dark');
-  document.body.classList.add('bg-dark', 'text-light');
-  localStorage.setItem('tema', 'oscuro');
-});
