@@ -1,5 +1,5 @@
 // ===================================================
-// UI.JS - VIEW (INTERFAZ DE USUARIO Y PRESENTACIÓN)
+// VIEW.JS - VIEW (INTERFAZ DE USUARIO Y PRESENTACIÓN)
 // ===================================================
 
 // ELEMENTOS DEL DOM PARA UI

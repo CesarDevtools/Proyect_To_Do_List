@@ -1,5 +1,5 @@
 // ===================================================
-// LISTA.JS - MODEL (GESTIÓN DE DATOS Y LÓGICA DE NEGOCIO)
+// MODEL.JS - MODEL (GESTIÓN DE DATOS Y LÓGICA DE NEGOCIO)
 // ===================================================
 
 // Array principal de tareas

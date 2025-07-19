@@ -1,5 +1,5 @@
 // ===================================================
-// SCRIPT.JS - CONTROLLER (COORDINADOR ENTRE MODEL Y VIEW)
+// CONTROLLER.JS - CONTROLLER (COORDINADOR ENTRE MODEL Y VIEW)
 // ===================================================
 
 // IMPORTACIONES
@@ -13,9 +13,9 @@ import {
     reordenarTareas,
     obtenerEstadisticas,
     estaVacia
-} from "./lista.js";
+} from "./model.js";
 
-import { inicializarUI } from "./ui.js";
+import { inicializarUI } from "./view.js";
 
 // Variables para las funciones de UI
 let uiFunciones;
