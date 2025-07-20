@@ -129,14 +129,14 @@ function limpiarFormulario() {
 function mostrarFormularioEdicion(index, tarea, guardarCallback) {
     const formularioHTML = `
         <li id="tarea-${index}" draggable="false" class="list-group-item d-flex flex-column align-items-start position-relative">
-            <input type="text" class="form-control mb-2" value="${tarea.titulo}" id="editTitulo-${index}">
-            <select class="form-select mb-2" id="editCategoria-${index}">
+            <input type="text" class="input mb-2" value="${tarea.titulo}" id="editTitulo-${index}">
+            <select class="input mb-2" id="editCategoria-${index}">
                 <option value="Hogar" ${tarea.categoria === 'Hogar' ? 'selected' : ''}>Hogar</option>
                 <option value="Salud" ${tarea.categoria === 'Salud' ? 'selected' : ''}>Salud</option>
                 <option value="Trabajo" ${tarea.categoria === 'Trabajo' ? 'selected' : ''}>Trabajo</option>
                 <option value="Importante" ${tarea.categoria === 'Importante' ? 'selected' : ''}>Importante</option>
             </select>
-            <input type="text" class="form-control mb-2" value="${tarea.descripcion}" id="editDescripcion-${index}">
+            <input type="text" class="input mb-2" value="${tarea.descripcion}" id="editDescripcion-${index}">
             <button class="btn btn-success btn-sm js-guardarTarea" data-index="${index}">Guardar</button>
         </li>
     `;
