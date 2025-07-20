@@ -73,7 +73,7 @@
         <!-- Select: Categoría -->
         <div class="col-auto">
           <select id="tareaCategoria">
-            <option value="" disabled selected>Selecciona una categoría</option>
+            <option value="" disabled selected>Categoria</option>
             <option value="Hogar">Hogar</option>
             <option value="Salud">Salud</option>
             <option value="Trabajo">Trabajo</option>
@@ -81,10 +81,16 @@
           </select>
         </div>
         <!-- Botón: Filtrar y opciones de filtro -->
-        <div class="col-auto">
-          <button type="button" id="botonFiltrar" class="btn btn-warning botonFiltrar">Filtrar</button>
+        <div class="col-auto d-flex align-items-center gap-2">
+          <button type="button" id="botonFiltrar" class="filter-button" title="Filtrar tareas">
+            <span class="hamburger-icon">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+          </button>
           <!-- Opciones de filtrado (espacio siempre reservado) -->
-          <div id="filtrosOpciones" class="btn-group ms-2" role="group">
+          <div id="filtrosOpciones" class="btn-group" role="group">
             <button id="filtroTodas" type="button" class="btn btn-outline-secondary">Todas</button>
             <button id="filtroCompletadas" type="button" class="btn btn-outline-success">Completadas</button>
             <button id="filtroPendientes" type="button" class="btn btn-outline-danger">Pendientes</button>

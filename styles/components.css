@@ -3,6 +3,72 @@
 =========================== */
 
 /* ===========================
+   BOTÓN FILTRAR CUADRADO
+=========================== */
+/* Botón cuadrado con hamburger menu */
+.filter-button {
+  position: relative;
+  width: 50px; /* Mismo ancho que el botón "+" */
+  height: 46px; /* Misma altura que el botón "+" */
+  border-radius: 12px; /* Esquinas redondeadas */
+  border: none;
+  cursor: pointer;
+  background-color: #ffc107; /* Color amarillo de Bootstrap warning */
+  transition: all 0.2s ease;
+  display: inline-flex; /* Cambio de flex a inline-flex */
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  vertical-align: middle; /* Para mejor alineación */
+}
+
+.filter-button:hover {
+  background-color: #ffca2c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.filter-button:active {
+  transform: scale(0.96);
+}
+
+/* Ícono hamburger menu */
+.hamburger-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamburger-icon span {
+  width: 18px;
+  height: 2.5px;
+  background-color: #212529; /* Color oscuro para contraste */
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Animación del hamburger al hover */
+.filter-button:hover .hamburger-icon span:nth-child(1) {
+  transform: translateY(1px);
+}
+
+.filter-button:hover .hamburger-icon span:nth-child(3) {
+  transform: translateY(-1px);
+}
+
+/* Tema oscuro para el botón filtrar */
+body.bg-dark .filter-button {
+  background-color: #ffca2c;
+}
+
+body.bg-dark .filter-button:hover {
+  background-color: #ffd60a;
+}
+
+/* ===========================
    BOTONES ANIMADOS
 =========================== */
 /* Botón Agregar con efecto de burbujas */
