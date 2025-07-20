@@ -8,8 +8,7 @@ const filtrosOpciones = document.getElementById('filtrosOpciones');
 const filtroTodas = document.getElementById('filtroTodas');
 const filtroCompletadas = document.getElementById('filtroCompletadas');
 const filtroPendientes = document.getElementById('filtroPendientes');
-const themeLight = document.getElementById('themeLight');
-const themeDark = document.getElementById('themeDark');
+const themeToggle = document.getElementById('themeToggle');
 const mensajeVacio = document.getElementById('mensajeVacio');
 const contadorTareas = document.getElementById('contadorTareas');
 const contenedorLista = document.getElementById('contenedorTareas');
@@ -367,6 +366,12 @@ function aplicarTemaClaro() {
     document.body.classList.remove('bg-dark', 'text-light');
     document.body.classList.add('bg-white', 'text-dark');
     localStorage.setItem('tema', 'claro');
+    
+    // Actualizar el switch (checked = claro = sol)
+    if (themeToggle) {
+        themeToggle.checked = true;
+    }
+    
     console.log('Tema cambiado a: claro');
 }
 
@@ -375,6 +380,12 @@ function aplicarTemaOscuro() {
     document.body.classList.remove('bg-white', 'text-dark');
     document.body.classList.add('bg-dark', 'text-light');
     localStorage.setItem('tema', 'oscuro');
+    
+    // Actualizar el switch (unchecked = oscuro = luna)
+    if (themeToggle) {
+        themeToggle.checked = false;
+    }
+    
     console.log('Tema cambiado a: oscuro');
 }
 
@@ -392,19 +403,16 @@ function cargarTema() {
 
 // Configurar eventos del tema
 function configurarEventosTema() {
-    // Tema claro
-    if (themeLight) {
-        themeLight.addEventListener('click', function(e) {
-            e.preventDefault();
-            aplicarTemaClaro();
-        });
-    }
-    
-    // Tema oscuro
-    if (themeDark) {
-        themeDark.addEventListener('click', function(e) {
-            e.preventDefault();
-            aplicarTemaOscuro();
+    // Theme toggle switch
+    if (themeToggle) {
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                // Switch activado = tema claro (sol)
+                aplicarTemaClaro();
+            } else {
+                // Switch desactivado = tema oscuro (luna)
+                aplicarTemaOscuro();
+            }
         });
     }
 }

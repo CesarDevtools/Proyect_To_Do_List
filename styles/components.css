@@ -3,6 +3,202 @@
 =========================== */
 
 /* ===========================
+   THEME SWITCH - TOGGLE DÍA/NOCHE
+=========================== */
+.switch {
+  font-size: 17px;
+  position: relative;
+  display: inline-block;
+  width: 4em;
+  height: 2.2em;
+  border-radius: 30px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #2a2a2a;
+  transition: 0.4s;
+  border-radius: 30px;
+  overflow: hidden;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 1.2em;
+  width: 1.2em;
+  border-radius: 20px;
+  left: 0.5em;
+  bottom: 0.5em;
+  transition: 0.4s;
+  transition-timing-function: cubic-bezier(0.81, -0.04, 0.38, 1.5);
+  box-shadow: inset 8px -4px 0px 0px #fff;
+}
+
+.switch input:checked + .slider {
+  background-color: #00a6ff;
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(1.8em);
+  box-shadow: inset 15px -4px 0px 15px #ffcf48;
+}
+
+.star {
+  background-color: #fff;
+  border-radius: 50%;
+  position: absolute;
+  width: 5px;
+  transition: all 0.4s;
+  height: 5px;
+}
+
+.star_1 {
+  left: 2.5em;
+  top: 0.5em;
+}
+
+.star_2 {
+  left: 2.2em;
+  top: 1.2em;
+}
+
+.star_3 {
+  left: 3em;
+  top: 0.9em;
+}
+
+.switch input:checked ~ .slider .star {
+  opacity: 0;
+}
+
+.cloud {
+  width: 3.5em;
+  position: absolute;
+  bottom: -1.4em;
+  left: -1.1em;
+  opacity: 0;
+  transition: all 0.4s;
+}
+
+.switch input:checked ~ .slider .cloud {
+  opacity: 1;
+}
+
+/* ===========================
+   BOTÓN LOGOUT ANIMADO
+=========================== */
+.Btn {
+  --black: #000000;
+  --ch-black: #141414;
+  --eer-black: #1b1b1b;
+  --night-rider: #2e2e2e;
+  --white: #ffffff;
+  --af-white: #f3f3f3;
+  --ch-white: #e1e1e1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 35px;
+  height: 35px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition-duration: .3s;
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.15);
+  /* Tema claro por defecto */
+  background-color: var(--af-white);
+}
+
+/* TEMA OSCURO */
+body.bg-dark .Btn {
+  background-color: var(--night-rider);
+}
+
+/* Icono del botón */
+.sign {
+  width: 100%;
+  transition-duration: .3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sign svg {
+  width: 14px;
+}
+
+.sign svg path {
+  /* Tema claro por defecto */
+  fill: var(--night-rider);
+  transition: fill 0.3s ease;
+}
+
+/* TEMA OSCURO - Icono */
+body.bg-dark .sign svg path {
+  fill: var(--af-white);
+}
+
+/* Texto del botón */
+.text {
+  position: absolute;
+  right: 0%;
+  width: 0%;
+  opacity: 0;
+  font-size: 1em;
+  font-weight: 600;
+  transition-duration: .3s;
+  /* Tema claro por defecto */
+  color: var(--night-rider);
+}
+
+/* TEMA OSCURO - Texto */
+body.bg-dark .text {
+  color: var(--af-white);
+}
+
+/* Efectos hover del botón */
+.Btn:hover {
+  width: 100px;
+  border-radius: 4px;
+  transition-duration: .3s;
+}
+
+.Btn:hover .sign {
+  width: 30%;
+  transition-duration: .3s;
+  padding-left: 15px;
+}
+
+.Btn:hover .text {
+  opacity: 1;
+  width: 70%;
+  transition-duration: .3s;
+  padding-right: 8px;
+}
+
+/* Efecto de click */
+.Btn:active {
+  transform: translate(2px ,2px);
+}
+
+/* ===========================
    LISTA DE TAREAS Y ITEMS
 =========================== */
 /* Items de la lista en modo oscuro */
