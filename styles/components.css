@@ -307,6 +307,30 @@ body.bg-dark .text {
 }
 
 /* ===========================
+   BOTONES DE FILTRADO
+=========================== */
+/* Espacio reservado para las opciones de filtro */
+#filtrosOpciones {
+  min-height: 38px; /* Altura de los botones para reservar espacio */
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  pointer-events: none;
+  visibility: hidden; /* Oculto pero mantiene el espacio */
+}
+
+#filtrosOpciones.mostrar {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+#filtrosOpciones.d-none {
+  display: none !important;
+}
+
+/* ===========================
    LISTA DE TAREAS Y ITEMS
 =========================== */
 /* Items de la lista en modo oscuro */

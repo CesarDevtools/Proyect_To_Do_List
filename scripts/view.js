@@ -208,14 +208,20 @@ function aplicarFiltro(tipoFiltro) {
     });
 }
 
-// Mostrar/ocultar menú de filtros
+// Mostrar/ocultar menú de filtros con animación suave
 function toggleMenuFiltros() {
-    filtrosOpciones.classList.toggle('d-none');
+    if (filtrosOpciones.classList.contains('mostrar')) {
+        // Ocultar con animación
+        filtrosOpciones.classList.remove('mostrar');
+    } else {
+        // Mostrar con animación
+        filtrosOpciones.classList.add('mostrar');
+    }
 }
 
-// Ocultar menú de filtros
+// Ocultar menú de filtros con animación
 function ocultarMenuFiltros() {
-    filtrosOpciones.classList.add('d-none');
+    filtrosOpciones.classList.remove('mostrar');
 }
 
 // Configurar eventos de filtros
