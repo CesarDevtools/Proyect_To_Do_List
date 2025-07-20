@@ -1,0 +1,146 @@
+/* ===========================
+   COMPONENTS.CSS - FORMULARIOS, LISTAS Y DROPDOWNS
+=========================== */
+
+/* ===========================
+   LISTA DE TAREAS Y ITEMS
+=========================== */
+/* Items de la lista en modo oscuro */
+.theme-dark .list-group-item,
+body.bg-dark .list-group-item {
+  background-color: var(--dark-secondary-bg) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-border) !important;
+}
+
+/* Descripción de la tarea en modo oscuro */
+.theme-dark .list-group-item .small,
+body.bg-dark .list-group-item .small {
+  color: var(--dark-muted-text) !important;
+}
+
+/* Cursor en los spans de la lista */
+li span {
+  cursor: pointer;
+}
+
+/* ===========================
+   DROPDOWNS
+=========================== */
+/* Dropdown del navbar en modo oscuro */
+.theme-dark .navbar .dropdown-menu,
+body.bg-dark .navbar .dropdown-menu {
+  background-color: var(--dark-secondary-bg) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-border) !important;
+}
+
+/* Dropdown items del navbar en modo oscuro */
+.theme-dark .navbar .dropdown-item,
+body.bg-dark .navbar .dropdown-item {
+  color: var(--dark-text) !important;
+}
+
+.theme-dark .navbar .dropdown-item:hover,
+.theme-dark .navbar .dropdown-item:focus,
+body.bg-dark .navbar .dropdown-item:hover,
+body.bg-dark .navbar .dropdown-item:focus {
+  background-color: var(--dark-border) !important;
+  color: var(--primary-text) !important;
+}
+
+/* Botón de tres puntos en modo oscuro */
+.theme-dark .list-group-item .btn,
+body.bg-dark .list-group-item .btn {
+  color: var(--dark-text) !important;
+}
+
+/* Menú dropdown en modo oscuro */
+.theme-dark .dropdown-menu,
+body.bg-dark .dropdown-menu {
+  background-color: var(--dark-secondary-bg) !important;
+  border-color: var(--dark-border) !important;
+}
+
+/* Items del dropdown en modo oscuro */
+.theme-dark .dropdown-item,
+body.bg-dark .dropdown-item {
+  color: var(--dark-text) !important;
+}
+
+.theme-dark .dropdown-item:hover,
+.theme-dark .dropdown-item:focus,
+body.bg-dark .dropdown-item:hover,
+body.bg-dark .dropdown-item:focus {
+  background-color: var(--dark-border) !important;
+  color: var(--primary-text) !important;
+}
+
+/* Color específico para botones de acción */
+.theme-dark .dropdown-item.text-primary,
+body.bg-dark .dropdown-item.text-primary {
+  color: var(--accent-blue) !important;
+}
+
+.theme-dark .dropdown-item.text-danger,
+body.bg-dark .dropdown-item.text-danger {
+  color: var(--accent-red) !important;
+}
+
+/* ===========================
+   FORMULARIOS E INPUTS
+=========================== */
+.theme-dark .form-control,
+body.bg-dark .form-control,
+.theme-dark .form-select,
+body.bg-dark .form-select {
+  background-color: var(--dark-secondary-bg) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-border) !important;
+}
+
+.theme-dark .form-control::placeholder,
+body.bg-dark .form-control::placeholder {
+  color: var(--dark-muted-text) !important;
+}
+
+/* ===========================
+   MENSAJE DE LISTA VACÍA
+=========================== */
+/* Color adaptativo para el mensaje */
+body.bg-dark #mensajeVacio,
+.theme-dark #mensajeVacio {
+  color: var(--dark-text) !important;
+}
+
+body.bg-white #mensajeVacio,
+body:not(.bg-dark) #mensajeVacio {
+  color: var(--light-text) !important;
+}
+
+/* Aparición elegante del mensaje */
+#mensajeVacio {
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+#mensajeVacio.mostrar {
+  opacity: 1;
+}
+
+/* ===========================
+   TÍTULO ELEGANTE
+=========================== */
+.titulo-cursiva {
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 600;
+  color: var(--light-text);
+  letter-spacing: 2px;
+  border-bottom: 2px solid var(--light-text);
+  max-width: fit-content;
+  padding-bottom: 0.2em;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+}

@@ -1,0 +1,10 @@
+/* ===========================
+   STYLES.CSS - ARCHIVO PRINCIPAL
+   Importa todos los módulos CSS
+=========================== */
+
+/* Importación de módulos CSS */
+@import url('./base.css');        /* Variables y estilos generales */
+@import url('./layout.css');      /* Navbar y estructuras principales */
+@import url('./components.css');  /* Formularios, listas y componentes */
+@import url('./animations.css');  /* Transiciones y efectos */

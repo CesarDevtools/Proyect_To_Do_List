@@ -1,0 +1,63 @@
+/* ===========================
+   LAYOUT.CSS - NAVBAR Y ESTRUCTURAS PRINCIPALES
+=========================== */
+
+/* ===========================
+   NAVBAR Y HEADER
+=========================== */
+/* Navbar fondo en modo light */
+.navbar {
+  background-color: var(--primary-color) !important;
+}
+
+/* Navbar fondo y color en modo oscuro */
+.theme-dark .navbar,
+body.bg-dark .navbar {
+  background-color: var(--dark-bg) !important;
+}
+
+/* Marca de la app (título) en navbar modo light */
+.navbar .navbar-brand {
+  color: var(--primary-text) !important;
+}
+
+/* Marca de la app (título) en navbar modo oscuro */
+.theme-dark .navbar .navbar-brand,
+body.bg-dark .navbar .navbar-brand {
+  color: var(--primary-text) !important;
+}
+
+/* Botones del navbar en modo light */
+.navbar .btn-outline-danger {
+  color: var(--primary-text) !important;
+  border-color: var(--primary-text) !important;
+}
+
+.navbar .btn-outline-dark {
+  color: var(--primary-text) !important;
+  border-color: var(--primary-text) !important;
+}
+
+/* Botones del navbar en modo oscuro */
+.theme-dark .navbar .btn,
+body.bg-dark .navbar .btn {
+  color: var(--primary-text) !important;
+  border-color: var(--primary-text) !important;
+}
+
+.theme-dark .navbar .btn-outline-dark,
+body.bg-dark .navbar .btn-outline-dark,
+.theme-dark .navbar .btn-outline-secondary,
+body.bg-dark .navbar .btn-outline-secondary {
+  color: var(--primary-text) !important;
+  border-color: var(--primary-text) !important;
+}
+
+/* ===========================
+   CONTENEDOR DE TAREAS
+=========================== */
+body.bg-dark #contenedorTareas {
+  background-color: var(--dark-secondary-bg) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-border) !important;
+}

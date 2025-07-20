@@ -1,0 +1,53 @@
+/* ===========================
+   BASE.CSS - VARIABLES Y ESTILOS GENERALES
+=========================== */
+
+/* Variables CSS personalizadas */
+:root {
+  /* Colores principales */
+  --primary-color: #009087;
+  --primary-text: #fff;
+  
+  /* Colores modo claro */
+  --light-bg: white;
+  --light-text: #222;
+  --light-border: #dee2e6;
+  
+  /* Colores modo oscuro */
+  --dark-bg: #212529;
+  --dark-secondary-bg: #23272b;
+  --dark-text: #f8f9fa;
+  --dark-muted-text: #adb5bd;
+  --dark-border: #343a40;
+  
+  /* Colores de acento */
+  --accent-blue: #4dabf7;
+  --accent-red: #ff6b6b;
+  --muted-text: #6c757d;
+  
+  /* Fuentes */
+  --font-family: 'Segoe UI', 'Arial', sans-serif;
+  
+  /* Transiciones */
+  --transition-fast: 0.3s ease;
+  --transition-medium: 0.4s ease-out;
+}
+
+/* ===========================
+   ESTILOS GENERALES DEL BODY
+=========================== */
+body {
+  background-color: var(--light-bg);
+  font-family: var(--font-family);
+}
+
+body.bg-dark {
+  background-color: var(--dark-bg) !important;
+}
+
+/* ===========================
+   UTILIDADES GENERALES
+=========================== */
+.bg-purple {
+  background-color: #6f42c1 !important;
+}
