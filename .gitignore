@@ -1,3 +1,5 @@
 
 # Archivos Markdown
 *.md 
+.env
+node_modules

@@ -247,11 +247,83 @@ function configurarDragAndDrop() {
 }
 
 // ===================================================
+// FUNCIONES DE AUTENTICACIÓN
+// ===================================================
+
+// Función para manejar logout
+async function handleLogout() {
+    try {
+        // Obtener datos del usuario antes de limpiar
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        // Mostrar confirmación
+        const confirmLogout = confirm('¿Estás seguro de que quieres cerrar sesión?');
+        if (!confirmLogout) return;
+
+        // Realizar petición de logout al servidor
+        const response = await fetch('/logout', {
+            method: 'POST',
+            credentials: 'include' // Incluir cookies para el refresh token
+        });
+
+        // Mostrar mensaje de despedida
+        alert(`¡Hasta luego${user.name ? ', ' + user.name : ''}! Sesión cerrada exitosamente.`);
+        
+        // Limpiar datos locales
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+        
+        // Redirigir al login
+        window.location.href = '/login';
+        
+    } catch (error) {
+        console.error('Error durante logout:', error);
+        
+        // Obtener datos del usuario antes de limpiar
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        // Aunque haya error, limpiar datos locales
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+        
+        alert(`¡Hasta luego${user.name ? ', ' + user.name : ''}! Sesión cerrada localmente.`);
+        window.location.href = '/login';
+    }
+}
+
+// Verificar si el usuario está autenticado
+function verificarAutenticacion() {
+    const token = localStorage.getItem('accessToken');
+    const user = localStorage.getItem('user');
+    
+    if (!token || !user) {
+        // Si no hay token o usuario, redirigir al login
+        window.location.href = '/login';
+        return false;
+    }
+    
+    // Opcional: Mostrar nombre del usuario en la UI
+    try {
+        const userData = JSON.parse(user);
+        console.log(`Usuario autenticado: ${userData.name} (${userData.email})`);
+    } catch (error) {
+        console.error('Error al parsear datos de usuario:', error);
+    }
+    
+    return true;
+}
+
+// ===================================================
 // INICIALIZACIÓN DEL CONTROLADOR
 // ===================================================
 
 // Inicializar la aplicación al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
+    // Verificar autenticación antes de inicializar la app
+    if (!verificarAutenticacion()) {
+        return; // Si no está autenticado, ya se redirigió
+    }
+    
     // Inicializar UI y obtener funciones
     uiFunciones = inicializarUI();
     
@@ -266,4 +338,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Configurar el evento del botón agregar
 botonAgregar.addEventListener('click', crearNuevaTarea);
+
+// Configurar el evento del botón logout
+const logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', handleLogout);
+}
 
