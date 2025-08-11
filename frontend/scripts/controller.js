@@ -101,12 +101,13 @@ async function borrarTarea(index) {
 }
 
 // Alternar el estado de completada de una tarea
-function marcarCompletada(index) {
-    const resultado = toggleCompletarTarea(index);
+async function marcarCompletada(index) {
+    const resultado = await toggleCompletarTarea(index);
     
     if (resultado.exito) {
         // Actualizar vista
         actualizarVista();
+        console.log('Estado de tarea cambiado exitosamente');
     } else {
         uiFunciones.mostrarError(resultado.mensaje);
     }
@@ -128,12 +129,12 @@ function modificarTarea(index) {
 }
 
 // Guardar los cambios de la tarea editada
-function guardarTareaEditada(index) {
+async function guardarTareaEditada(index) {
     // Obtener datos del formulario de edición
     const datosEdicion = uiFunciones.obtenerDatosFormularioEdicion(index);
     
     // Actualizar a través del modelo
-    const resultado = actualizarTarea(
+    const resultado = await actualizarTarea(
         index,
         datosEdicion.titulo,
         datosEdicion.categoria,
@@ -150,17 +151,18 @@ function guardarTareaEditada(index) {
 }
 
 // Reordenar las tareas en el array
-function cambiarOrdenTareas(tareaOrigen, tareaDestino) {
+async function cambiarOrdenTareas(tareaOrigen, tareaDestino) {
     // Obtener índices de las tareas
     const indiceOrigen = parseInt(tareaOrigen.id.split('-')[1]);
     const indiceDestino = parseInt(tareaDestino.id.split('-')[1]);
     
     // Reordenar a través del modelo
-    const resultado = reordenarTareas(indiceOrigen, indiceDestino);
+    const resultado = await reordenarTareas(indiceOrigen, indiceDestino);
     
     if (resultado.exito) {
         // Actualizar vista
         actualizarVista();
+        console.log('Tareas reordenadas exitosamente');
     } else {
         uiFunciones.mostrarError(resultado.mensaje);
     }
