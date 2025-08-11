@@ -2,54 +2,44 @@
 // MODEL.JS - MODEL (GESTIÓN DE DATOS Y LÓGICA DE NEGOCIO)
 // ===================================================
 
-// Array principal de tareas
+// Importar funciones de la API
+import * as API from './api.js';
+
+// Array principal de tareas (ahora se sincroniza con el backend)
 export const lista = [];
 
-// Clave para localStorage
-const STORAGE_KEY = 'todoList_tareas';
-
 // ===================================================
-// FUNCIONES DE PERSISTENCIA
+// FUNCIONES DE PERSISTENCIA (AHORA CON BACKEND)
 // ===================================================
 
-// Guardar las tareas en localStorage
-function guardarStorage() {
+// Cargar tareas desde el backend
+async function cargarTareas() {
     try {
-        const listasJSON = JSON.stringify(lista);
-        localStorage.setItem(STORAGE_KEY, listasJSON);
-        console.log('Tareas guardadas en localStorage:', lista);
-    } catch (error) {
-        console.error('Error al guardar en localStorage:', error);
-    }
-}
-
-// Cargar las tareas desde localStorage
-function cargarStorage() {
-    try {
-        const listasJSON = localStorage.getItem(STORAGE_KEY);
+        const resultado = await API.obtenerTareas();
         
-        if (listasJSON) {
-            const tareasGuardadas = JSON.parse(listasJSON);
-            
-            // Limpiar el array actual
+        if (resultado.exito) {
+            // Limpiar array local
             lista.length = 0;
             
-            // Agregar las tareas cargadas
-            tareasGuardadas.forEach(tarea => {
+            // Agregar tareas del servidor
+            resultado.tareas.forEach(tarea => {
                 lista.push(tarea);
             });
             
-            console.log('Tareas cargadas desde localStorage:', lista);
+            console.log('Tareas cargadas desde el servidor:', lista);
+            return { exito: true };
         } else {
-            console.log('No hay tareas guardadas en localStorage');
+            console.error('Error cargando tareas:', resultado.mensaje);
+            return { exito: false, mensaje: resultado.mensaje };
         }
     } catch (error) {
-        console.error('Error al cargar desde localStorage:', error);
+        console.error('Error al cargar tareas:', error);
+        return { exito: false, mensaje: error.message };
     }
 }
 
 // ===================================================
-// OPERACIONES CRUD (Create, Read, Update, Delete)
+// OPERACIONES CRUD (AHORA CON BACKEND)
 // ===================================================
 
 // Validar los datos antes de crear una tarea
@@ -66,18 +56,8 @@ function validarDatos(titulo, categoria) {
     };
 }
 
-// Crear un objeto tarea nuevo
-function crearTarea(titulo, descripcion, categoria) {
-    return {
-        titulo: titulo,
-        categoria: categoria,
-        descripcion: descripcion,
-        completada: false
-    };
-}
-
-// Agregar una tarea al array
-function agregarTarea(titulo, descripcion, categoria) {
+// Agregar una tarea (envía al backend)
+async function agregarTarea(titulo, descripcion, categoria) {
     const validacion = validarDatos(titulo, categoria);
     
     if (!validacion.esValido) {
@@ -87,22 +67,37 @@ function agregarTarea(titulo, descripcion, categoria) {
         };
     }
     
-    const nuevaTarea = crearTarea(titulo, descripcion, categoria);
-    lista.push(nuevaTarea);
-    guardarStorage();
-    
-    console.log('Tarea agregada:', nuevaTarea);
-    console.log('Lista completa:', lista);
-    
-    return {
-        exito: true,
-        tarea: nuevaTarea,
-        indice: lista.length - 1
-    };
+    try {
+        const resultado = await API.crearTarea(titulo, descripcion, categoria);
+        
+        if (resultado.exito) {
+            // Agregar a la lista local
+            lista.push(resultado.tarea);
+            
+            console.log('Tarea agregada:', resultado.tarea);
+            
+            return {
+                exito: true,
+                tarea: resultado.tarea,
+                indice: lista.length - 1
+            };
+        } else {
+            return {
+                exito: false,
+                mensaje: resultado.mensaje
+            };
+        }
+    } catch (error) {
+        console.error('Error agregando tarea:', error);
+        return {
+            exito: false,
+            mensaje: 'Error conectando con el servidor'
+        };
+    }
 }
 
-// Actualizar una tarea existente
-function actualizarTarea(index, nuevoTitulo, nuevaCategoria, nuevaDescripcion) {
+// Actualizar una tarea existente (envía al backend)
+async function actualizarTarea(index, nuevoTitulo, nuevaCategoria, nuevaDescripcion) {
     if (index < 0 || index >= lista.length) {
         return {
             exito: false,
@@ -117,42 +112,43 @@ function actualizarTarea(index, nuevoTitulo, nuevaCategoria, nuevaDescripcion) {
         };
     }
     
-    // Actualizar el objeto en el array
-    lista[index].titulo = nuevoTitulo;
-    lista[index].categoria = nuevaCategoria;
-    lista[index].descripcion = nuevaDescripcion;
-    
-    guardarStorage();
-    
-    console.log('Tarea actualizada:', lista[index]);
-    
-    return {
-        exito: true,
-        tarea: lista[index]
-    };
-}
-
-// Eliminar una tarea del array
-function eliminarTarea(index) {
-    if (index >= 0 && index < lista.length) {
-        const tareaEliminada = lista.splice(index, 1)[0];
-        guardarStorage();
-        console.log('Tarea eliminada. Lista actualizada:', lista);
+    try {
+        const tareaActual = lista[index];
+        const datosActualizacion = {
+            titulo: nuevoTitulo,
+            categoria: nuevaCategoria,
+            descripcion: nuevaDescripcion
+        };
         
+        const resultado = await API.actualizarTarea(tareaActual._id, datosActualizacion);
+        
+        if (resultado.exito) {
+            // Actualizar en la lista local
+            lista[index] = resultado.tarea;
+            
+            console.log('Tarea actualizada:', resultado.tarea);
+            
+            return {
+                exito: true,
+                tarea: resultado.tarea
+            };
+        } else {
+            return {
+                exito: false,
+                mensaje: resultado.mensaje
+            };
+        }
+    } catch (error) {
+        console.error('Error actualizando tarea:', error);
         return {
-            exito: true,
-            tareaEliminada: tareaEliminada
+            exito: false,
+            mensaje: 'Error conectando con el servidor'
         };
     }
-    
-    return {
-        exito: false,
-        mensaje: 'Índice de tarea inválido'
-    };
 }
 
-// Alternar el estado de completada de una tarea
-function toggleCompletarTarea(index) {
+// Eliminar una tarea (envía al backend)
+async function eliminarTarea(index) {
     if (index < 0 || index >= lista.length) {
         return {
             exito: false,
@@ -160,20 +156,79 @@ function toggleCompletarTarea(index) {
         };
     }
     
-    // Cambiar el estado en el array
-    lista[index].completada = !lista[index].completada;
-    guardarStorage();
-    
-    console.log(`Tarea ${index} ${lista[index].completada ? 'completada' : 'pendiente'}:`, lista[index]);
-    
-    return {
-        exito: true,
-        tarea: lista[index]
-    };
+    try {
+        const tareaAEliminar = lista[index];
+        const resultado = await API.eliminarTarea(tareaAEliminar._id);
+        
+        if (resultado.exito) {
+            // Eliminar de la lista local
+            const tareaEliminada = lista.splice(index, 1)[0];
+            
+            console.log('Tarea eliminada:', tareaEliminada);
+            
+            return {
+                exito: true,
+                tareaEliminada: tareaEliminada
+            };
+        } else {
+            return {
+                exito: false,
+                mensaje: resultado.mensaje
+            };
+        }
+    } catch (error) {
+        console.error('Error eliminando tarea:', error);
+        return {
+            exito: false,
+            mensaje: 'Error conectando con el servidor'
+        };
+    }
 }
 
-// Reordenar las tareas en el array
-function reordenarTareas(indiceOrigen, indiceDestino) {
+// Alternar el estado de completada de una tarea (envía al backend)
+async function toggleCompletarTarea(index) {
+    if (index < 0 || index >= lista.length) {
+        return {
+            exito: false,
+            mensaje: 'Índice de tarea inválido'
+        };
+    }
+    
+    try {
+        const tareaActual = lista[index];
+        const nuevoEstado = !tareaActual.completada;
+        
+        const resultado = await API.actualizarTarea(tareaActual._id, { 
+            completada: nuevoEstado 
+        });
+        
+        if (resultado.exito) {
+            // Actualizar en la lista local
+            lista[index] = resultado.tarea;
+            
+            console.log(`Tarea ${index} ${nuevoEstado ? 'completada' : 'pendiente'}:`, resultado.tarea);
+            
+            return {
+                exito: true,
+                tarea: resultado.tarea
+            };
+        } else {
+            return {
+                exito: false,
+                mensaje: resultado.mensaje
+            };
+        }
+    } catch (error) {
+        console.error('Error actualizando estado de tarea:', error);
+        return {
+            exito: false,
+            mensaje: 'Error conectando con el servidor'
+        };
+    }
+}
+
+// Reordenar las tareas (envía al backend)
+async function reordenarTareas(indiceOrigen, indiceDestino) {
     if (indiceOrigen < 0 || indiceOrigen >= lista.length || 
         indiceDestino < 0 || indiceDestino >= lista.length) {
         return {
@@ -182,16 +237,40 @@ function reordenarTareas(indiceOrigen, indiceDestino) {
         };
     }
     
-    // Mover el elemento en el array
-    const tareaMovida = lista.splice(indiceOrigen, 1)[0];
-    lista.splice(indiceDestino, 0, tareaMovida);
-    
-    guardarStorage();
-    console.log('Tareas reordenadas:', lista);
-    
-    return {
-        exito: true
-    };
+    try {
+        const tareaMovida = lista[indiceOrigen];
+        
+        const resultado = await API.reordenarTareas(
+            tareaMovida._id, 
+            indiceOrigen, 
+            indiceDestino
+        );
+        
+        if (resultado.exito) {
+            // Actualizar lista local con el nuevo orden del servidor
+            lista.length = 0;
+            resultado.tareas.forEach(tarea => {
+                lista.push(tarea);
+            });
+            
+            console.log('Tareas reordenadas:', lista);
+            
+            return {
+                exito: true
+            };
+        } else {
+            return {
+                exito: false,
+                mensaje: resultado.mensaje
+            };
+        }
+    } catch (error) {
+        console.error('Error reordenando tareas:', error);
+        return {
+            exito: false,
+            mensaje: 'Error conectando con el servidor'
+        };
+    }
 }
 
 // ===================================================
@@ -233,8 +312,7 @@ function estaVacia() {
 // ===================================================
 
 export { 
-    guardarStorage, 
-    cargarStorage,
+    cargarTareas,
     agregarTarea,
     actualizarTarea,
     eliminarTarea,

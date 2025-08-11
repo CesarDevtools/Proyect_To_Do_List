@@ -25,7 +25,7 @@ const handleLogin = async (req, res) => {
                 }
             },
             process.env.ACCESS_TOKEN_SECRET, // Usa clave secreta del .env
-            { expiresIn: '15m' } // Token expira en 15 minutos (más razonable que 60s)
+            { expiresIn: '1h' } // Token expira en 1 hora
         );
         const refreshToken = jwt.sign( // Genera token de renovación
             { "email": foundUser.email },

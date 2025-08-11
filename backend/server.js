@@ -49,7 +49,7 @@ app.use('/refresh', require('./routes/refresh')); // Renovación de tokens
 app.use('/logout', require('./routes/logout')); // Cierre de sesión
 
 app.use(verifyJWT); // Middleware JWT - Rutas siguientes requieren autenticación
-
+app.use('/tasks', require('./routes/api/tasks')); // Rutas de tareas (CRUD) 
 
 // Manejo de rutas no encontradas (404)
 app.get(/.*/, (req, res) => {

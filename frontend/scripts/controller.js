@@ -5,7 +5,7 @@
 // IMPORTACIONES
 import { 
     lista, 
-    cargarStorage,
+    cargarTareas,
     agregarTarea,
     actualizarTarea,
     eliminarTarea,
@@ -16,6 +16,7 @@ import {
 } from "./model.js";
 
 import { inicializarUI } from "./view.js";
+import * as API from "./api.js";
 
 // Variables para las funciones de UI
 let uiFunciones;
@@ -47,12 +48,12 @@ function actualizarVista() {
 // ===================================================
 
 // Agregar nueva tarea
-function crearNuevaTarea() {
+async function crearNuevaTarea() {
     // Obtener datos del formulario (a través de la vista)
     const datosFormulario = uiFunciones.obtenerDatosFormulario();
     
     // Procesar a través del modelo
-    const resultado = agregarTarea(
+    const resultado = await agregarTarea(
         datosFormulario.titulo,
         datosFormulario.descripcion,
         datosFormulario.categoria
@@ -68,7 +69,9 @@ function crearNuevaTarea() {
         // Animar la nueva tarea añadida
         setTimeout(() => {
             const nuevaTarea = document.getElementById(`tarea-${resultado.indice}`);
-            uiFunciones.animarAparicionTarea(nuevaTarea);
+            if (nuevaTarea) {
+                uiFunciones.animarAparicionTarea(nuevaTarea);
+            }
         }, 100);
     } else {
         // Mostrar error
@@ -77,13 +80,13 @@ function crearNuevaTarea() {
 }
 
 // Eliminar tarea
-function borrarTarea(index) {
+async function borrarTarea(index) {
     const tareaElement = document.getElementById(`tarea-${index}`);
     
     // Animar eliminación y luego proceder
-    uiFunciones.animarEliminacionTarea(tareaElement, () => {
+    uiFunciones.animarEliminacionTarea(tareaElement, async () => {
         // Eliminar a través del modelo
-        const resultado = eliminarTarea(index);
+        const resultado = await eliminarTarea(index);
         
         if (resultado.exito) {
             // Actualizar vista
@@ -318,7 +321,7 @@ function verificarAutenticacion() {
 // ===================================================
 
 // Inicializar la aplicación al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Verificar autenticación antes de inicializar la app
     if (!verificarAutenticacion()) {
         return; // Si no está autenticado, ya se redirigió
@@ -327,8 +330,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar UI y obtener funciones
     uiFunciones = inicializarUI();
     
-    // Cargar tareas desde localStorage
-    cargarStorage();
+    // Cargar tareas desde el backend
+    try {
+        const resultado = await cargarTareas();
+        if (resultado.exito) {
+            console.log('Tareas cargadas exitosamente');
+        } else {
+            uiFunciones.mostrarError('Error cargando tareas: ' + resultado.mensaje);
+        }
+    } catch (error) {
+        console.error('Error al cargar tareas:', error);
+        uiFunciones.mostrarError('Error conectando con el servidor');
+    }
     
     // Actualizar vista inicial
     actualizarVista();

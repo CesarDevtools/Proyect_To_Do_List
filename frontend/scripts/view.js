@@ -11,7 +11,7 @@ const filtroPendientes = document.getElementById('filtroPendientes');
 const themeToggle = document.getElementById('themeToggle');
 const mensajeVacio = document.getElementById('mensajeVacio');
 const contadorTareas = document.getElementById('contadorTareas');
-const contenedorLista = document.getElementById('contenedorTareas');
+const contenedorLista = document.getElementById('listaTareas'); // ← Corregido: usar el ID correcto
 
 // ===================================================
 // FUNCIONES DE RENDERIZADO DEL DOM
